@@ -2,17 +2,10 @@
 
 # 📋 História de Usuário: Consultar Alunos Matriculados  
 
-## **🙋‍♂️ Histórias de Usuário** 
-
 👨‍🏫
 **Como** Professor,  
 **Eu quero** visualizar a lista de alunos matriculados nas minhas disciplinas,  
 **Para que** eu possa gerenciar presenças, enviar comunicados e acompanhar o desempenho da turma.
-
-👨‍🎓
-**Como** Aluno,  
-**Eu quero** quero gerenciar minhas matrículas nas disciplinas,  
-**Para que** eu possa ter o controle de quais matérias cursar.
 
 ---
 
@@ -32,3 +25,15 @@
 - **Fonte de dados:** Sistema acadêmico (ex.: SGA).  
 - **Pré-condição:** Professor deve estar logado e ter disciplinas atribuídas.  
 - **Pós-condição:** Dados exibidos em tabela ordenável/paginável. 
+
+# 📋 História de Usuário: Gerenciar matrículas  
+
+👨‍🎓
+**Como** Aluno,  
+**Eu quero** quero gerenciar minhas matrículas nas disciplinas,  
+**Para que** eu possa ter o controle de quais matérias cursar.
+
+## **🎯 Critérios de Aceitação**  
+✔ A lista deve mostrar todas as disciplinas disponíveis para matrícula.
+✔ A lista deve mostrar as disciplinas que o aluno já está cursando.
+✔ A lista deve oferecer opção para adicionar ou remover disciplinas.
