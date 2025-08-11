@@ -28,7 +28,7 @@
 
 ---
 
-## **🔍 Detalhamento Técnico (Opcional)**  
+## **🔍 Detalhamento Técnico **  
 - **Fonte de dados:** Sistema acadêmico (ex.: SGA).  
 - **Pré-condição:** Professor deve estar logado e ter disciplinas atribuídas.  
 - **Pós-condição:** Dados exibidos em tabela ordenável/paginável. 
