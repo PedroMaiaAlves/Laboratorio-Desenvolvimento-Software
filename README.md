@@ -2,10 +2,17 @@
 
 # 📋 História de Usuário: Consultar Alunos Matriculados  
 
-## **📌 Descrição**  
-**Como** professor,  
+## **🙋‍♂️ Histórias de Usuário** 
+
+👨‍🏫
+**Como** Professor,  
 **Eu quero** visualizar a lista de alunos matriculados nas minhas disciplinas,  
-**Para que** eu possa gerenciar presenças, enviar comunicados e acompanhar o desempenho da turma.  
+**Para que** eu possa gerenciar presenças, enviar comunicados e acompanhar o desempenho da turma.
+
+👨‍🎓
+**Como** Aluno,  
+**Eu quero** quero gerenciar minhas matrículas nas disciplinas,  
+**Para que** eu possa ter o controle de quais matérias cursar.
 
 ---
 
