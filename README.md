@@ -36,6 +36,6 @@
 ---
 
 ## **🎯 Critérios de Aceitação**  
-✔ A lista deve mostrar todas as disciplinas disponíveis para matrícula.
-✔ A lista deve mostrar as disciplinas que o aluno já está cursando.
-✔ A lista deve oferecer opção para adicionar ou remover disciplinas.
+- ✔ A lista deve mostrar todas as disciplinas disponíveis para matrícula.
+- ✔ A lista deve mostrar as disciplinas que o aluno já está cursando.
+- ✔ A lista deve oferecer opção para adicionar ou remover disciplinas.
