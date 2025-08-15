@@ -1,6 +1,6 @@
 # Laboratorio-Desenvolvimento-Software
 
-# 📋 História de Usuário: Consultar Alunos Matriculados  
+# 📋 História de Usuário: Consultar Alunos Matriculados - HS01
 
 👨‍🏫
 **Como** Professor,  
@@ -26,7 +26,7 @@
 - **Pré-condição:** Professor deve estar logado e ter disciplinas atribuídas.  
 - **Pós-condição:** Dados exibidos em tabela ordenável/paginável. 
 
-# 📋 História de Usuário: Gerenciar matrículas  
+# 📋 História de Usuário: Gerenciar matrículas  - HS02
 
 👨‍🎓
 **Como** Aluno,  
