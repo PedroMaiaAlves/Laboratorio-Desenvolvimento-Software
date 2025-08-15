@@ -41,4 +41,4 @@
 - ✔ A lista deve oferecer opção para adicionar ou remover disciplinas.
 
 ## **📦Diagrama de Classes do Sistema** 
-![Imagem Diagrama de Classes](caminho/para/imagem.png)
+![Imagem Diagrama de Classes](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software)
