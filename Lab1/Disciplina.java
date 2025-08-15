@@ -1,14 +1,14 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class Disciplina {
+public class Disciplina{
     private int carga;
     private String nome;
     private boolean ativo;
     private List<Aluno> alunos;
     private static final int MIN_ALUNO = 3;
     private static final int MAX_ALUNO = 60;
-    private int totalALunos;
+    private int totalAlunos;
     private double preco;
     private DisciplinaType tipoDisciplina;
 
@@ -17,7 +17,7 @@ public class Disciplina {
         this.nome = nome;
         this.preco = preco;
         this.ativo = false;
-        this.totalALunos = 0;
+        this.totalAlunos = 0;
         this.alunos = new ArrayList<Aluno>();
         this.tipoDisciplina = tipoDisciplina;
     }
@@ -50,16 +50,16 @@ public class Disciplina {
         return alunos;
     }
 
-    public void setAlunos(List<Aluno> alunos) {
-        this.alunos = alunos;
+    public void setAluno(Aluno aluno){
+        this.alunos.add(aluno);
     }
 
-    public int getTotalALunos() {
-        return totalALunos;
+    public int getTotalAlunos() {
+        return totalAlunos;
     }
 
-    public void setTotalALunos(int totalALunos) {
-        this.totalALunos = totalALunos;
+    public void setTotalAlunos(int totalALunos) {
+        this.totalAlunos = totalALunos;
     }
 
     public double getPreco() {
@@ -76,5 +76,9 @@ public class Disciplina {
 
     public void setTipoDisciplina(DisciplinaType tipoDisciplina) {
         this.tipoDisciplina = tipoDisciplina;
+    }
+
+    public boolean temEspaco(){
+        return getTotalAlunos() < MAX_ALUNO;
     }
 }

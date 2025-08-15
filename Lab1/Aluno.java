@@ -14,6 +14,22 @@ public class Aluno extends Usuario{
         this.disciplinasOptativas = new ArrayList<Disciplina>();
     }
 
+    public List<Disciplina> getDisciplinasObrigatorias() {
+        return disciplinasObrigatorias;
+    }
+
+    public void setDisciplinasObrigatorias(List<Disciplina> disciplinasObrigatorias) {
+        this.disciplinasObrigatorias = disciplinasObrigatorias;
+    }
+
+    public List<Disciplina> getDisciplinasOptativas() {
+        return disciplinasOptativas;
+    }
+
+    public void setDisciplinasOptativas(List<Disciplina> disciplinasOptativas) {
+        this.disciplinasOptativas = disciplinasOptativas;
+    }
+
     public void addDisciplina(Disciplina disciplina) throws Exception{
         if(disciplina.getTipoDisciplina().equals(DisciplinaType.OBRIGATORIA)){
             if(disciplinasObrigatorias.size() < MAX_OBRIGATORIAS){
