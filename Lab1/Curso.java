@@ -1,11 +1,15 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Curso {
     private String nome;
     private int credito;
-    private Disciplina[] disciplinas[];
+    private List<Disciplina> disciplinas;
 
     public Curso(String nome, int credito){
         this.nome = nome;
         this.credito = credito;
+        this.disciplinas = new ArrayList<Disciplina>();
     }
 
     public String getNome(){
@@ -22,5 +26,13 @@ public class Curso {
 
     public void setCredito(int credito){
         this.credito = credito;
+    }
+
+    public List<Disciplina> getDisciplinas() {
+        return disciplinas;
+    }
+
+    public void setDisciplinas(List<Disciplina> disciplinas) {
+        this.disciplinas = disciplinas;
     }
 }
