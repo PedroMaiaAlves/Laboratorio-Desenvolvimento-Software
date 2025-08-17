@@ -1,46 +1,46 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class Aluno extends Usuario{
+public class Aluno extends Usuario {
 
-    private static final int MAX_OBRIGATORIAS = 4;
-    private static final int MAX_OPTATIVAS = 2;
-    private List<Disciplina> disciplinasObrigatorias;
-    private List<Disciplina> disciplinasOptativas;
+    private static final int A_MAX_OBRIGATORIAS = 4;
+    private static final int A_MAX_OPTATIVAS = 2;
+    private List<Disciplina> A_disciplinasObrigatorias;
+    private List<Disciplina> A_disciplinasOptativas;
 
     public Aluno(String nome, String codigoPessoa, String cpf, String senha){
         super(nome, codigoPessoa, cpf, senha);
-        this.disciplinasObrigatorias = new ArrayList<Disciplina>();
-        this.disciplinasOptativas = new ArrayList<Disciplina>();
+        this.A_disciplinasObrigatorias = new ArrayList<Disciplina>();
+        this.A_disciplinasOptativas = new ArrayList<Disciplina>();
     }
 
     public List<Disciplina> getDisciplinasObrigatorias() {
-        return disciplinasObrigatorias;
+        return A_disciplinasObrigatorias;
     }
 
-    public void setDisciplinasObrigatorias(List<Disciplina> disciplinasObrigatorias) {
-        this.disciplinasObrigatorias = disciplinasObrigatorias;
+    public void setDisciplinasObrigatorias(List<Disciplina> A_disciplinasObrigatorias) {
+        this.A_disciplinasObrigatorias = A_disciplinasObrigatorias;
     }
 
     public List<Disciplina> getDisciplinasOptativas() {
-        return disciplinasOptativas;
+        return A_disciplinasOptativas;
     }
 
-    public void setDisciplinasOptativas(List<Disciplina> disciplinasOptativas) {
-        this.disciplinasOptativas = disciplinasOptativas;
+    public void setDisciplinasOptativas(List<Disciplina> A_disciplinasOptativas) {
+        this.A_disciplinasOptativas = A_disciplinasOptativas;
     }
 
     public void addDisciplina(Disciplina disciplina) throws Exception{
         if(disciplina.getTipoDisciplina().equals(DisciplinaType.OBRIGATORIA)){
-            if(disciplinasObrigatorias.size() < MAX_OBRIGATORIAS){
-                disciplinasObrigatorias.add(disciplina);
+            if(A_disciplinasObrigatorias.size() < A_MAX_OBRIGATORIAS){
+                A_disciplinasObrigatorias.add(disciplina);
             }else{
                 throw new Exception("Limite de obrigatórias atingido.");
             }
         }
         else if(disciplina.getTipoDisciplina().equals(DisciplinaType.OPTATIVA)){
-            if(disciplinasOptativas.size() < MAX_OPTATIVAS){
-                disciplinasOptativas.add(disciplina);
+            if(A_disciplinasOptativas.size() < A_MAX_OPTATIVAS){
+                A_disciplinasOptativas.add(disciplina);
             }else{
                 throw new Exception("Limite de optativas atingido.");
             }
