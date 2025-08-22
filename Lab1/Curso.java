@@ -32,7 +32,7 @@ public class Curso {
         return disciplinas;
     }
 
-    public void setDisciplinas(List<Disciplina> disciplinas) {
-        this.disciplinas = disciplinas;
+    public void setDisciplina(Disciplina disciplina) {
+        this.disciplinas.add(disciplina);
     }
 }
