@@ -84,8 +84,17 @@ public class Secretaria {
                         disciplina.getPreco() + ";" +
                         disciplina.isAtivo() + ";" +
                         disciplina.getTotalAlunos() + ";" +
-                        disciplina.getTipoDisciplina() + "\n";
-                writer.write(linha);
+                        disciplina.getTipoDisciplina() + ";";
+
+                        List<Aluno> alunos = disciplina.getAlunos();
+                        for (Aluno aluno : alunos) {
+                            linha += aluno.getNome() + ","; // ou aluno.getCodigoPessoa()
+                        }
+                        if (!alunos.isEmpty()) {
+                            linha = linha.substring(0, linha.length() - 1); // remove última vírgula
+                        }
+                        linha += "\n";
+                        writer.write(linha);
             }
         } catch (IOException e) {
             System.err.println("Erro ao salvar disciplinas: " + e.getMessage());

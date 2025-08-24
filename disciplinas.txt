@@ -1,0 +1,3 @@
+2
+Calculo I;80;300.0;false;0;OBRIGATORIA;
+Filosofia;40;150.0;false;0;OPTATIVA;
