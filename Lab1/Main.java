@@ -276,8 +276,7 @@ public class Main {
         }
         secretaria.salvarDadosEmTxt();
     }
-   
-   
+
     private static void cadastrarProfessorEmDisciplina(Scanner teclado, Secretaria secretaria, Professor professor){
         System.out.println("\nQual disciplina você quer lecionar?");
 
@@ -289,10 +288,12 @@ public class Main {
         int opcao = teclado.nextInt();
         teclado.nextLine();
 
-        professor.addDisciplina(secretaria.getDisciplinas().get(opcao - 1));
-        System.out.println("\nDisciplina adicionada com sucesso!");
-
-
+        if(professor.getDisciplinasLecionadas().contains(secretaria.getDisciplinas().get(opcao - 1))){
+            System.out.println("Disciplina Já existe no sistema!");
+        }else{
+            professor.addDisciplina(secretaria.getDisciplinas().get(opcao - 1));
+            System.out.println("\nDisciplina adicionada com sucesso!");
+        }
         secretaria.salvarDadosEmTxt();
     }
 
@@ -318,8 +319,7 @@ public class Main {
         }
         secretaria.salvarDadosEmTxt();
     }
-   
-   
+
     private static void excluirDisciplinaProfessor(Scanner teclado, Professor professor , Secretaria secretaria){
 
         for (int i = 0; i < professor.getDisciplinasLecionadas().size(); i++){
