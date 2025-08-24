@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -188,6 +190,116 @@ public class Main {
         }
     }
 
+    private static void setDisciplinasCadastradasObrigatoria(Scanner teclado, Secretaria secretaria, Aluno aluno) {
+        List<Disciplina> temporarias = new ArrayList<Disciplina>();
+
+        for (int i = 0; i < secretaria.getDisciplinas().size(); i++){
+            if(secretaria.getDisciplinas().get(i).getTipoDisciplina() == DisciplinaType.OBRIGATORIA){
+                temporarias.add(secretaria.getDisciplinas().get(i));
+            }
+            //System.out.println(i + 1 + " - " + secretaria.getDisciplinas().get(i).getNome());
+        }
+
+        for (int i = 0; i < temporarias.size(); i++){
+            System.out.println((i + 1) + " - " + temporarias.get(i).getNome());
+        }
+
+        System.out.println("Selecione a disciplina digitando seu número:");
+        if (temporarias.isEmpty()) {
+            System.out.println("Não há disciplinas obrigatórias cadastradas.");
+            return;
+        }
+        int opcao = teclado.nextInt();
+        teclado.nextLine();
+        try {
+            aluno.addDisciplina(temporarias.get(opcao - 1));
+            System.out.println("Disciplina cadastrada com sucesso!");
+            temporarias.get(opcao - 1).setAluno(aluno);
+            if(temporarias.get(opcao -1).getAlunos().contains(aluno)){
+                System.out.println("Disciplina cadastrada com sucesso e aluno adicionado à disciplina!");
+            } else {
+                System.out.println("Erro: aluno não foi adicionado à disciplina!");
+            }
+
+        } catch (Exception e) {
+            System.out.println("Erro ao adicionar disciplina: " + e.getMessage());
+        }
+    }
+
+    private static void setDisciplinasCadastradasOptativa(Scanner teclado, Secretaria secretaria, Aluno aluno){
+        List<Disciplina> temporarias = new ArrayList<Disciplina>();
+
+        for (int i = 0; i < secretaria.getDisciplinas().size(); i++){
+            if(secretaria.getDisciplinas().get(i).getTipoDisciplina() == DisciplinaType.OPTATIVA){
+                temporarias.add(secretaria.getDisciplinas().get(i));
+            }
+            //System.out.println(i + 1 + " - " + secretaria.getDisciplinas().get(i).getNome());
+        }
+
+        for (int i = 0; i < temporarias.size(); i++){
+            System.out.println((i + 1) + " - " + temporarias.get(i).getNome());
+        }
+
+        System.out.println("Selecione a disciplina digitando seu número:");
+        if (temporarias.isEmpty()) {
+            System.out.println("Não há disciplinas optativas cadastradas.");
+            return;
+        }
+        int opcao = teclado.nextInt();
+        teclado.nextLine();
+        try {
+            aluno.addDisciplina(temporarias.get(opcao - 1));
+            System.out.println("Disciplina cadastrada com sucesso!");
+            temporarias.get(opcao - 1).setAluno(aluno);
+            if(temporarias.get(opcao -1).getAlunos().contains(aluno)){
+                System.out.println("Disciplina cadastrada com sucesso e aluno adicionado à disciplina!");
+            } else {
+                System.out.println("Erro: aluno não foi adicionado à disciplina!");
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao adicionar disciplina: " + e.getMessage());
+        }
+    }
+
+    private static void cadastrarAlunoEmDisciplina(Scanner teclado, Secretaria secretaria, Aluno aluno){
+        System.out.println("Qual disciplina você quer matricular?");
+        System.out.println("1 - Matricular em disciplina Obrigatória");
+        System.out.println("2 - Matricular em disciplina Optativa");
+        int opcao = teclado.nextInt();
+        teclado.nextLine();
+        if(opcao == 1){
+            setDisciplinasCadastradasObrigatoria(teclado, secretaria, aluno);
+        }else if(opcao == 2){
+            setDisciplinasCadastradasOptativa(teclado, secretaria, aluno);
+        }else{
+            System.out.println("Não existe esta opção!");
+        }
+        secretaria.salvarDadosEmTxt();
+    }
+
+    private static void excluirDisciplina(Scanner teclado, Aluno aluno, Secretaria secretaria){
+        List<Disciplina> temporarias = new ArrayList<Disciplina>();
+
+        temporarias.addAll(aluno.getDisciplinasObrigatorias());
+        temporarias.addAll(aluno.getDisciplinasOptativas());
+
+        for (int i = 0; i < temporarias.size(); i++){
+            System.out.println((i + 1) + " - " + temporarias.get(i).getNome());
+        }
+        System.out.println("Qual disciplina você quer excluir?");
+        int opcao = teclado.nextInt();
+        teclado.nextLine();
+        Disciplina escolhida = temporarias.get(opcao - 1);
+
+        try{
+            aluno.removerDisciplina(escolhida);
+            System.out.println("Disciplina excluída com sucesso!");
+        } catch (Exception e) {
+            System.out.println("Erro ao excluir disciplina: " + e.getMessage());
+        }
+        secretaria.salvarDadosEmTxt();
+    }
+
     private static Object realizarLogin(Scanner teclado, Secretaria secretaria) {
         System.out.println("\n--- LOGIN NO SISTEMA ---");
         System.out.println("Você é: ");
@@ -315,16 +427,33 @@ public class Main {
             teclado.nextLine();
 
             switch (opcao) {
+                case 1: cadastrarAlunoEmDisciplina(teclado, secretaria, aluno);
+                break;
+
                 case 2:
-                    System.out.println("Disciplinas obrigatórias:");
-                    for (Disciplina disciplina : aluno.getDisciplinasObrigatorias()) {
-                        System.out.println("- " + disciplina.getNome());
-                    }
-                    System.out.println("Disciplinas optativas:");
-                    for (Disciplina disciplina : aluno.getDisciplinasOptativas()) {
-                        System.out.println("- " + disciplina.getNome());
+                    List<Disciplina> temporarias = new ArrayList<Disciplina>();
+
+                    temporarias.addAll(aluno.getDisciplinasObrigatorias());
+                    temporarias.addAll(aluno.getDisciplinasOptativas());
+
+                    if(temporarias.isEmpty()){
+                        System.out.println("Você não está cursando nenhuma disciplina!");
+                    } else {
+                        System.out.println("Estas são as disciplinas que você está cursando");
+                        System.out.println("Disciplinas obrigatórias:");
+                        for (Disciplina disciplina : aluno.getDisciplinasObrigatorias()) {
+                            System.out.println("- " + disciplina.getNome());
+                        }
+                        System.out.println("Disciplinas optativas:");
+                        for (Disciplina disciplina : aluno.getDisciplinasOptativas()) {
+                            System.out.println("- " + disciplina.getNome());
+                        }
                     }
                     break;
+
+                case 3: excluirDisciplina(teclado,aluno,secretaria);
+                break;
+
                 case 4:
                     System.out.println("Nome: " + aluno.getNome());
                     System.out.println("CPF: " + aluno.getCpf());
@@ -332,9 +461,9 @@ public class Main {
                     break;
                 case 5:
                     System.out.println("Cursos disponíveis:");
-                    for (Curso curso : secretaria.getCursos()) {
-                        System.out.println("- " + curso.getNome() + " (" + curso.getCredito() + " créditos)");
-                        System.out.println("  Disciplinas: " + curso.getDisciplinas().size());
+                    for (Curso cursoD : secretaria.getCursos()) {
+                        System.out.println("- " + cursoD.getNome() + " (" + cursoD.getCredito() + " créditos)");
+                        System.out.println("  Disciplinas: " + cursoD.getDisciplinas().size());
                     }
                     break;
                 case 0:

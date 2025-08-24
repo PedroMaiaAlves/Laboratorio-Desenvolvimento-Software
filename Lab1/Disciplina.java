@@ -52,14 +52,16 @@ public class Disciplina{
 
     public void setAluno(Aluno aluno){
         this.alunos.add(aluno);
+        this.setAtivo(true);
+        this.totalAlunos++;
     }
 
     public int getTotalAlunos() {
         return totalAlunos;
     }
 
-    public void setTotalAlunos(int totalALunos) {
-        this.totalAlunos = totalALunos;
+    public void setTotalAlunos() {
+        this.totalAlunos++;
     }
 
     public double getPreco() {
@@ -81,4 +83,14 @@ public class Disciplina{
     public boolean temEspaco(){
         return getTotalAlunos() < MAX_ALUNO;
     }
+
+    public void removerAluno(Aluno aluno) {
+        if (alunos.remove(aluno)) {
+            totalAlunos--;
+            if(totalAlunos == 0){
+                setAtivo(false);
+            }
+        }
+    }
+
 }
