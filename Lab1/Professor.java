@@ -35,4 +35,8 @@ public class Professor extends Usuario{
 
         return retorno;
     }
+
+     public void removerDisciplina(Disciplina disciplina) throws Exception {
+          disciplinasLecionadas.remove(disciplina);
+    }
 }

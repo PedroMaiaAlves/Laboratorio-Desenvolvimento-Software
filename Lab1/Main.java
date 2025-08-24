@@ -276,6 +276,25 @@ public class Main {
         }
         secretaria.salvarDadosEmTxt();
     }
+   
+   
+    private static void cadastrarProfessorEmDisciplina(Scanner teclado, Secretaria secretaria, Professor professor){
+        System.out.println("\nQual disciplina você quer lecionar?");
+
+        for (int i = 0; i < secretaria.getDisciplinas().size(); i++){
+           System.out.println(i + 1 + " - " + secretaria.getDisciplinas().get(i).getNome());
+           //1 - Calculo I 
+           //2 
+        }
+        int opcao = teclado.nextInt();
+        teclado.nextLine();
+
+        professor.addDisciplina(secretaria.getDisciplinas().get(opcao - 1));
+        System.out.println("\nDisciplina adicionada com sucesso!");
+
+
+        secretaria.salvarDadosEmTxt();
+    }
 
     private static void excluirDisciplina(Scanner teclado, Aluno aluno, Secretaria secretaria){
         List<Disciplina> temporarias = new ArrayList<Disciplina>();
@@ -293,6 +312,26 @@ public class Main {
 
         try{
             aluno.removerDisciplina(escolhida);
+            System.out.println("Disciplina excluída com sucesso!");
+        } catch (Exception e) {
+            System.out.println("Erro ao excluir disciplina: " + e.getMessage());
+        }
+        secretaria.salvarDadosEmTxt();
+    }
+   
+   
+    private static void excluirDisciplinaProfessor(Scanner teclado, Professor professor , Secretaria secretaria){
+
+        for (int i = 0; i < professor.getDisciplinasLecionadas().size(); i++){
+            System.out.println((i + 1) + " - " + professor.getDisciplinasLecionadas().get(i).getNome());
+        }
+        System.out.println("Qual disciplina você quer excluir?");
+        int opcao = teclado.nextInt();
+        teclado.nextLine();
+        Disciplina escolhida = professor.getDisciplinasLecionadas().get(opcao - 1);
+
+        try{
+            professor.removerDisciplina(escolhida);
             System.out.println("Disciplina excluída com sucesso!");
         } catch (Exception e) {
             System.out.println("Erro ao excluir disciplina: " + e.getMessage());
@@ -391,6 +430,15 @@ public class Main {
                         System.out.println("- " + disciplina.getNome());
                     }
                     break;
+                case 2: 
+                     System.out.println("Adicionar disciplina");
+                     cadastrarProfessorEmDisciplina(teclado, secretaria, professor);
+                     break;
+                case 3:
+                     System.out.println("Remover Disciplina");
+                     excluirDisciplinaProfessor(teclado, professor, secretaria);
+                     break;
+                    
                 case 4:
                     System.out.println("Nome: " + professor.getNome());
                     System.out.println("CPF: " + professor.getCpf());
@@ -420,6 +468,7 @@ public class Main {
             System.out.println("3. Cancelar matrícula");
             System.out.println("4. Ver perfil");
             System.out.println("5. Ver cursos disponíveis");
+            System.out.println("6. Ver preço da mensalidade");
             System.out.println("0. Voltar ao menu principal");
             System.out.print("Digite a opção: ");
 
@@ -465,6 +514,10 @@ public class Main {
                         System.out.println("- " + cursoD.getNome() + " (" + cursoD.getCredito() + " créditos)");
                         System.out.println("  Disciplinas: " + cursoD.getDisciplinas().size());
                     }
+                    break;
+                case 6:
+                    Cobranca cobranca = new Cobranca(aluno);
+                    gerarCobrancas(aluno, cobranca, secretaria);
                     break;
                 case 0:
                     System.out.println("Voltando ao menu principal...");
@@ -595,5 +648,12 @@ public class Main {
 
         cursoSelecionado.setDisciplina(disciplina);
         System.out.println("Disciplina '" + disciplina.getNome() + "' adicionada ao curso '" + cursoSelecionado.getNome() + "' com sucesso!");
+    }
+
+    private static void gerarCobrancas(Aluno aluno, Cobranca cobranca, Secretaria secretaria){
+        double valor = cobranca.gerarCobranca(aluno);
+        System.out.println("Aluno: " + aluno.getNome() + "o valor da sua mensalidade será: " + valor);
+        aluno.setMensalidade(valor);
+        secretaria.salvarDadosEmTxt();
     }
 }

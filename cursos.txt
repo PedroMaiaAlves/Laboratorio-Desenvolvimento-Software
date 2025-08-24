@@ -1,2 +1,2 @@
 1
-Engenharia;100;2;Calculo I,Filosofia
+Engenharia;100;3;Calculo I,Filosofia,AEDS II

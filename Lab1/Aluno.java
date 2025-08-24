@@ -8,6 +8,7 @@ public class Aluno extends Usuario {
     private List<Disciplina> A_disciplinasObrigatorias;
     private List<Disciplina> A_disciplinasOptativas;
     private Disciplina A_disciplina;
+    private double A_mensalidade;
 
     public Aluno(String nome, String codigoPessoa, String cpf, String senha){
         super(nome, codigoPessoa, cpf, senha);
@@ -29,6 +30,14 @@ public class Aluno extends Usuario {
 
     public void setDisciplinasOptativas(Disciplina disciplina) {
         this.A_disciplinasOptativas.add(disciplina);
+    }
+
+    public double setMensalidade(double mensalidade) {
+        return this.A_mensalidade = mensalidade;
+    }
+    
+    public double getA_mensalidade() {
+        return A_mensalidade;
     }
 
     public void addDisciplina(Disciplina disciplina) throws Exception{
