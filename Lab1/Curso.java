@@ -12,6 +12,10 @@ public class Curso {
         this.disciplinas = new ArrayList<Disciplina>();
     }
 
+    public Curso() {
+
+    }
+
     public String getNome(){
         return this.nome;
     }
