@@ -19,7 +19,7 @@ public class Curso {
     public void setNome(String nome){
         this.nome = nome;
     }
-git
+
     public int getCredito(){
         return this.credito;
     }
