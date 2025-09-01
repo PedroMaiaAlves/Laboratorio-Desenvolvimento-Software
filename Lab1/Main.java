@@ -14,9 +14,6 @@ public class Main {
             System.out.println("\n=== SISTEMA DE MATRÍCULA ===");
             System.out.println("1. Cadastrar novo usuário");
             System.out.println("2. Realizar login");
-            System.out.println("3. Cadastrar curso");
-            System.out.println("4. Adicionar disciplina ao curso");
-            System.out.println("5. Cadastrar disciplina");
             System.out.println("0. Sair do sistema");
             System.out.print("Digite a opção: ");
 
@@ -39,22 +36,12 @@ public class Main {
                         } else if (usuarioLogado instanceof Aluno) {
                             Aluno aluno = (Aluno) usuarioLogado;
                             menuAluno(teclado, secretaria, aluno);
+                        } else if (usuarioLogado instanceof String && usuarioLogado.equals("admin")) {
+                            menuAdmin(teclado, secretaria);
                         }
                     } else {
                         System.out.println("Login falhou! Verifique suas credenciais.");
                     }
-                    break;
-                case 3:
-                    cadastrarNovoCurso(teclado, secretaria);
-                    secretaria.salvarDadosEmTxt();
-                    break;
-                case 4:
-                    adicionarDisciplinaAoCurso(teclado, secretaria);
-                    secretaria.salvarDadosEmTxt();
-                    break;
-                case 5:
-                    cadastrarNovaDisciplina(teclado, secretaria);
-                    secretaria.salvarDadosEmTxt();
                     break;
                 case 0:
                     System.out.println("Saindo do sistema...");
@@ -280,24 +267,60 @@ public class Main {
         secretaria.salvarDadosEmTxt();
     }
 
-    private static void cadastrarProfessorEmDisciplina(Scanner teclado, Secretaria secretaria, Professor professor){
-        System.out.println("\nQual disciplina você quer lecionar?");
+    private static void vincularProfessorDisciplina(Scanner teclado, Secretaria secretaria) {
+        System.out.println("\n--- VINCULAR PROFESSOR À DISCIPLINA ---");
 
-        for (int i = 0; i < secretaria.getDisciplinas().size(); i++){
-           System.out.println(i + 1 + " - " + secretaria.getDisciplinas().get(i).getNome());
-           //1 - Calculo I 
-           //2 
+        if (secretaria.getProfessores().isEmpty()) {
+            System.out.println("Nenhum professor cadastrado no sistema.");
+            return;
         }
-        int opcao = teclado.nextInt();
+
+        if (secretaria.getDisciplinas().isEmpty()) {
+            System.out.println("Nenhuma disciplina cadastrada no sistema.");
+            return;
+        }
+
+        System.out.println("Professores disponíveis:");
+        for (int i = 0; i < secretaria.getProfessores().size(); i++) {
+            Professor professor = secretaria.getProfessores().get(i);
+            System.out.println((i + 1) + ". " + professor.getNome() + " (" + professor.getCodigoPessoa() + ")");
+        }
+
+        System.out.print("Digite o número do professor: ");
+        int numeroProfessor = teclado.nextInt() - 1;
         teclado.nextLine();
 
-        if(professor.getDisciplinasLecionadas().contains(secretaria.getDisciplinas().get(opcao - 1))){
-            System.out.println("Disciplina Já existe no sistema!");
-        }else{
-            professor.addDisciplina(secretaria.getDisciplinas().get(opcao - 1));
-            System.out.println("\nDisciplina adicionada com sucesso!");
+        if (numeroProfessor < 0 || numeroProfessor >= secretaria.getProfessores().size()) {
+            System.out.println("Número de professor inválido!");
+            return;
         }
-        secretaria.salvarDadosEmTxt();
+
+        Professor professorSelecionado = secretaria.getProfessores().get(numeroProfessor);
+
+        System.out.println("Disciplinas disponíveis:");
+        for (int i = 0; i < secretaria.getDisciplinas().size(); i++) {
+            Disciplina disciplina = secretaria.getDisciplinas().get(i);
+            System.out.println((i + 1) + ". " + disciplina.getNome());
+        }
+
+        System.out.print("Digite o número da disciplina: ");
+        int numeroDisciplina = teclado.nextInt() - 1;
+        teclado.nextLine();
+
+        if (numeroDisciplina < 0 || numeroDisciplina >= secretaria.getDisciplinas().size()) {
+            System.out.println("Número de disciplina inválido!");
+            return;
+        }
+
+        Disciplina disciplinaSelecionada = secretaria.getDisciplinas().get(numeroDisciplina);
+
+        if (professorSelecionado.getDisciplinasLecionadas().contains(disciplinaSelecionada)) {
+            System.out.println("Este professor já leciona esta disciplina!");
+            return;
+        }
+
+        professorSelecionado.getDisciplinasLecionadas().add(disciplinaSelecionada);
+        System.out.println("Professor '" + professorSelecionado.getNome() + "' vinculado à disciplina '" + disciplinaSelecionada.getNome() + "' com sucesso!");
     }
 
     private static void excluirDisciplina(Scanner teclado, Aluno aluno, Secretaria secretaria){
@@ -328,27 +351,70 @@ public class Main {
         secretaria.salvarDadosEmTxt();
     }
 
-    private static void excluirDisciplinaProfessor(Scanner teclado, Professor professor , Secretaria secretaria){
+    private static void desvincularProfessorDisciplina(Scanner teclado, Secretaria secretaria) {
+        System.out.println("\n--- DESVINCULAR PROFESSOR DA DISCIPLINA ---");
 
-        for (int i = 0; i < professor.getDisciplinasLecionadas().size(); i++){
-            System.out.println((i + 1) + " - " + professor.getDisciplinasLecionadas().get(i).getNome());
+        if (secretaria.getProfessores().isEmpty()) {
+            System.out.println("Nenhum professor cadastrado no sistema.");
+            return;
         }
-        System.out.println("Qual disciplina você quer excluir?");
-        int opcao = teclado.nextInt();
+
+        System.out.println("Professores disponíveis:");
+        for (int i = 0; i < secretaria.getProfessores().size(); i++) {
+            Professor professor = secretaria.getProfessores().get(i);
+            System.out.println((i + 1) + ". " + professor.getNome() + " (" + professor.getCodigoPessoa() + ")");
+            System.out.println("   Disciplinas: " + professor.getDisciplinasLecionadas().size());
+        }
+
+        System.out.print("Digite o número do professor: ");
+        int numeroProfessor = teclado.nextInt() - 1;
         teclado.nextLine();
-        Disciplina escolhida = professor.getDisciplinasLecionadas().get(opcao - 1);
 
-        try{
-            professor.removerDisciplina(escolhida);
-            System.out.println("Disciplina excluída com sucesso!");
-        } catch (Exception e) {
-            System.out.println("Erro ao excluir disciplina: " + e.getMessage());
+        if (numeroProfessor < 0 || numeroProfessor >= secretaria.getProfessores().size()) {
+            System.out.println("Número de professor inválido!");
+            return;
         }
-        secretaria.salvarDadosEmTxt();
+
+        Professor professorSelecionado = secretaria.getProfessores().get(numeroProfessor);
+
+        if (professorSelecionado.getDisciplinasLecionadas().isEmpty()) {
+            System.out.println("Este professor não leciona nenhuma disciplina!");
+            return;
+        }
+
+        System.out.println("Disciplinas lecionadas por " + professorSelecionado.getNome() + ":");
+        for (int i = 0; i < professorSelecionado.getDisciplinasLecionadas().size(); i++) {
+            Disciplina disciplina = professorSelecionado.getDisciplinasLecionadas().get(i);
+            System.out.println((i + 1) + ". " + disciplina.getNome());
+        }
+
+        System.out.print("Digite o número da disciplina para remover: ");
+        int numeroDisciplina = teclado.nextInt() - 1;
+        teclado.nextLine();
+
+        if (numeroDisciplina < 0 || numeroDisciplina >= professorSelecionado.getDisciplinasLecionadas().size()) {
+            System.out.println("Número de disciplina inválido!");
+            return;
+        }
+
+        Disciplina disciplinaRemovida = professorSelecionado.getDisciplinasLecionadas().remove(numeroDisciplina);
+        System.out.println("Disciplina '" + disciplinaRemovida.getNome() + "' removida do professor '" + professorSelecionado.getNome() + "' com sucesso!");
     }
 
     private static Object realizarLogin(Scanner teclado, Secretaria secretaria) {
         System.out.println("\n--- LOGIN NO SISTEMA ---");
+
+        System.out.print("Digite seu código Pessoa (ou 'admin' para acesso administrativo): ");
+        String codigoPessoa = teclado.nextLine();
+
+        System.out.print("Digite sua senha: ");
+        String senha = teclado.nextLine();
+
+        // Verifica se é admin
+        if (codigoPessoa.equals("admin") && senha.equals("admin")) {
+            return "admin";
+        }
+
         System.out.println("Você é: ");
         System.out.println("1. Professor");
         System.out.println("2. Aluno");
@@ -356,12 +422,6 @@ public class Main {
 
         int opcaoTipo = teclado.nextInt();
         teclado.nextLine();
-
-        System.out.print("Digite seu código Pessoa: ");
-        String codigoPessoa = teclado.nextLine();
-
-        System.out.print("Digite sua senha: ");
-        String senha = teclado.nextLine();
 
         if (opcaoTipo == 1) {
             for (Professor professor : secretaria.getProfessores()) {
@@ -421,10 +481,8 @@ public class Main {
         do {
             System.out.println("\n=== MENU PROFESSOR ===");
             System.out.println("1. Ver minhas disciplinas");
-            System.out.println("2. Adicionar disciplina");
-            System.out.println("3. Remover disciplina");
-            System.out.println("4. Ver perfil");
-            System.out.println("5. Ver todos os cursos");
+            System.out.println("2. Ver perfil");
+            System.out.println("3. Ver todos os cursos");
             System.out.println("0. Voltar ao menu principal");
             System.out.print("Digite a opção: ");
 
@@ -438,21 +496,12 @@ public class Main {
                         System.out.println("- " + disciplina.getNome());
                     }
                     break;
-                case 2: 
-                     System.out.println("Adicionar disciplina");
-                     cadastrarProfessorEmDisciplina(teclado, secretaria, professor);
-                     break;
-                case 3:
-                     System.out.println("Remover Disciplina");
-                     excluirDisciplinaProfessor(teclado, professor, secretaria);
-                     break;
-                    
-                case 4:
+                case 2:
                     System.out.println("Nome: " + professor.getNome());
                     System.out.println("CPF: " + professor.getCpf());
                     System.out.println("Código: " + professor.getCodigoPessoa());
                     break;
-                case 5:
+                case 3:
                     System.out.println("Cursos disponíveis:");
                     for (Curso curso : secretaria.getCursos()) {
                         System.out.println("- " + curso.getNome() + " (" + curso.getCredito() + " créditos)");
@@ -663,5 +712,88 @@ public class Main {
         System.out.println("Aluno: " + aluno.getNome() + "o valor da sua mensalidade será: " + valor);
         aluno.setMensalidade(valor);
         secretaria.salvarDadosEmTxt();
+    }
+
+    private static void menuAdmin(Scanner teclado, Secretaria secretaria) {
+        int opcaoAdmin;
+
+        do {
+            System.out.println("\n=== MENU ADMINISTRATIVO ===");
+            System.out.println("1. Cadastrar curso");
+            System.out.println("2. Adicionar disciplina ao curso");
+            System.out.println("3. Cadastrar disciplina");
+            System.out.println("4. Vincular professor à disciplina");
+            System.out.println("5. Desvincular professor da disciplina");
+            System.out.println("6. Ver todos os dados do sistema");
+            System.out.println("0. Voltar ao menu principal");
+            System.out.print("Digite a opção: ");
+
+            opcaoAdmin = teclado.nextInt();
+            teclado.nextLine();
+
+            switch (opcaoAdmin) {
+                case 1:
+                    cadastrarNovoCurso(teclado, secretaria);
+                    secretaria.salvarDadosEmTxt();
+                    break;
+                case 2:
+                    adicionarDisciplinaAoCurso(teclado, secretaria);
+                    secretaria.salvarDadosEmTxt();
+                    break;
+                case 3:
+                    cadastrarNovaDisciplina(teclado, secretaria);
+                    secretaria.salvarDadosEmTxt();
+                    break;
+                case 4:
+                    vincularProfessorDisciplina(teclado, secretaria);
+                    secretaria.salvarDadosEmTxt();
+                    break;
+                case 5:
+                    desvincularProfessorDisciplina(teclado, secretaria);
+                    secretaria.salvarDadosEmTxt();
+                    break;
+                case 6:
+                    exibirTodosDados(secretaria);
+                    break;
+                case 0:
+                    System.out.println("Voltando ao menu principal...");
+                    break;
+                default:
+                    System.out.println("Opção inválida!");
+            }
+
+        } while (opcaoAdmin != 0);
+    }
+
+    private static void exibirTodosDados(Secretaria secretaria) {
+        System.out.println("\n=== DADOS COMPLETOS DO SISTEMA ===");
+
+        System.out.println("\n--- DISCIPLINAS (" + secretaria.getDisciplinas().size() + ") ---");
+        for (Disciplina disciplina : secretaria.getDisciplinas()) {
+            System.out.println("- " + disciplina.getNome() + " (" + disciplina.getTipoDisciplina() +
+                    ") - Carga: " + disciplina.getCarga() + "h - Preço: R$" + disciplina.getPreco());
+        }
+
+        System.out.println("\n--- CURSOS (" + secretaria.getCursos().size() + ") ---");
+        for (Curso curso : secretaria.getCursos()) {
+            System.out.println("- " + curso.getNome() + " (" + curso.getCredito() + " créditos)");
+            System.out.println("  Disciplinas: " + curso.getDisciplinas().size());
+            for (Disciplina disciplina : curso.getDisciplinas()) {
+                System.out.println("  * " + disciplina.getNome());
+            }
+        }
+
+        System.out.println("\n--- PROFESSORES (" + secretaria.getProfessores().size() + ") ---");
+        for (Professor professor : secretaria.getProfessores()) {
+            System.out.println("- " + professor.getNome() + " (" + professor.getCodigoPessoa() + ")");
+            System.out.println("  Disciplinas lecionadas: " + professor.getDisciplinasLecionadas().size());
+        }
+
+        System.out.println("\n--- ALUNOS (" + secretaria.getAlunos().size() + ") ---");
+        for (Aluno aluno : secretaria.getAlunos()) {
+            System.out.println("- " + aluno.getNome() + " (" + aluno.getCodigoPessoa() + ")");
+            System.out.println("  Disciplinas obrigatórias: " + aluno.getDisciplinasObrigatorias().size());
+            System.out.println("  Disciplinas optativas: " + aluno.getDisciplinasOptativas().size());
+        }
     }
 }
