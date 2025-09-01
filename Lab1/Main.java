@@ -194,10 +194,11 @@ public class Main {
         List<Disciplina> temporarias = new ArrayList<Disciplina>();
 
         for (int i = 0; i < secretaria.getDisciplinas().size(); i++){
-            if(secretaria.getDisciplinas().get(i).getTipoDisciplina() == DisciplinaType.OBRIGATORIA){
-                temporarias.add(secretaria.getDisciplinas().get(i));
+            for(Disciplina disciplina : aluno.getDisciplinasObrigatorias()) {
+                if (secretaria.getDisciplinas().get(i).getTipoDisciplina() == DisciplinaType.OBRIGATORIA) {
+                    temporarias.add(secretaria.getDisciplinas().get(i));
+                }
             }
-            //System.out.println(i + 1 + " - " + secretaria.getDisciplinas().get(i).getNome());
         }
 
         for (int i = 0; i < temporarias.size(); i++){
@@ -230,8 +231,10 @@ public class Main {
         List<Disciplina> temporarias = new ArrayList<Disciplina>();
 
         for (int i = 0; i < secretaria.getDisciplinas().size(); i++){
-            if(secretaria.getDisciplinas().get(i).getTipoDisciplina() == DisciplinaType.OPTATIVA){
-                temporarias.add(secretaria.getDisciplinas().get(i));
+            for(Disciplina disciplina: aluno.getDisciplinasOptativas()) {
+                if (secretaria.getDisciplinas().get(i).getTipoDisciplina() == DisciplinaType.OPTATIVA && !secretaria.getDisciplinas().get(i).equals(disciplina)) {
+                    temporarias.add(secretaria.getDisciplinas().get(i));
+                }
             }
             //System.out.println(i + 1 + " - " + secretaria.getDisciplinas().get(i).getNome());
         }
@@ -302,6 +305,11 @@ public class Main {
 
         temporarias.addAll(aluno.getDisciplinasObrigatorias());
         temporarias.addAll(aluno.getDisciplinasOptativas());
+
+        if(temporarias.isEmpty()){
+            System.out.println("Nenhuma disciplina cadastrada para o " + aluno.getNome());
+            return;
+        }
 
         for (int i = 0; i < temporarias.size(); i++){
             System.out.println((i + 1) + " - " + temporarias.get(i).getNome());
