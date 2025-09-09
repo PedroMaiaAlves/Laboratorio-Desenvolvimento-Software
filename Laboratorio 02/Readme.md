@@ -1,45 +1,48 @@
 # Laboratorio-Desenvolvimento-Software
 
-# 📋 História de Usuário: Consultar Alunos Matriculados - HS01
+## 📋 História de Usuário: Introduzir Pedido de Aluguel - HS01
 
-👨‍🏫
-**Como** Professor,  
-**Eu quero** visualizar a lista de alunos matriculados nas minhas disciplinas,  
-**Para que** eu possa gerenciar presenças, enviar comunicados e acompanhar o desempenho da turma.
+👤 Como Cliente,
+Eu quero introduzir um pedido de aluguel no sistema,
+Para que eu possa solicitar um contrato de aluguel associado a crédito, acompanhar e gerenciar meus pedidos.
 
----
+🎯 Critérios de Aceitação
+✔ O sistema deve permitir o cadastro de um novo pedido de aluguel.
+✔ O cliente pode associar um contrato de crédito ao pedido.
+✔ Deve ser possível consultar o status do pedido.
+✔ Deve ser possível modificar ou cancelar o pedido após a criação, desde que ainda não esteja em execução.
+✔ O pedido deve ser avaliado automaticamente ou por agentes (empresas/bancos) antes da execução.
+✔ O cliente deve estar autenticado (login realizado).
 
-## **🎯 Critérios de Aceitação**  
-✔ A lista deve exibir:  
-  - Nome do aluno.  
-  - Matrícula.  
-  - E-mail de contato.  
-  - Status (ativo/inativo).  
-✔ Deve ser possível filtrar por disciplina/turma.  
-✔ Opção de exportar a lista em **PDF** ou **CSV**.  
-✔ Acesso restrito apenas a professores vinculados à disciplina.  
+🔍 Detalhamento Técnico
 
----
+Pré-condição: Cliente deve estar logado no sistema.
 
-## **🔍 Detalhamento Técnico**  
-- **Fonte de dados:** Sistema acadêmico (ex.: SGA).  
-- **Pré-condição:** Professor deve estar logado e ter disciplinas atribuídas.  
-- **Pós-condição:** Dados exibidos em tabela ordenável/paginável. 
+Fonte de dados: Base de pedidos e contratos do sistema.
 
-# 📋 História de Usuário: Gerenciar matrículas  - HS02
+Pós-condição: Pedido registrado e associado a um contrato de aluguel.
 
-👨‍🎓
-**Como** Aluno,  
-**Eu quero** quero gerenciar minhas matrículas nas disciplinas,  
-**Para que** eu possa ter o controle de quais matérias cursar.
+Regra de negócio: Apenas pedidos aprovados por agentes ou pelo sistema podem ser executados.
 
----
+## 📋 História de Usuário: Consultar Pedido - HS02
 
-## **🎯 Critérios de Aceitação**  
-- ✔ A lista deve mostrar todas as disciplinas disponíveis para matrícula.
-- ✔ A lista deve mostrar as disciplinas que o aluno já está cursando.
-- ✔ A lista deve oferecer opção para adicionar ou remover disciplinas.
+👤 Como Cliente,
+Eu quero consultar os pedidos de aluguel que realizei,
+Para que eu possa acompanhar o status, verificar detalhes e decidir se preciso modificar ou cancelar.
 
-## **📦Diagrama de Classes do Sistema** 
-![Imagem Diagrama de Classes](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laborat%C3%B3rio%20Projeto%20de%20Software.png)
+🎯 Critérios de Aceitação
+✔ O sistema deve exibir uma lista de pedidos do cliente logado.
+✔ Cada pedido deve mostrar: número do pedido, data, status (em análise, aprovado, em execução, cancelado), valor e agente associado.
+✔ O cliente deve poder filtrar os pedidos por status ou período.
+✔ Deve existir uma opção para visualizar os detalhes completos do pedido.
+✔ Apenas o cliente autenticado pode visualizar seus próprios pedidos.
 
+🔍 Detalhamento Técnico
+
+Pré-condição: Cliente deve estar autenticado no sistema.
+
+Fonte de dados: Base de pedidos do sistema.
+
+Pós-condição: Dados exibidos em tela de forma paginável/ordenável.
+
+Regra de negócio: O cliente só tem acesso aos pedidos que ele próprio cadastrou.
