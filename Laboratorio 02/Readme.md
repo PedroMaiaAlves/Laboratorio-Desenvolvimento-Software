@@ -60,3 +60,87 @@
 
 ## 📦 Diagrama de Casos de Uso do Sistema  
 ![Imagem Diagrama de Casos de Uso](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio%2002/CasoUso-Lab2-2.png)
+
+## 🔎 Diagrama da Pacote
+```mermaid
+graph TB
+  %% Frontend
+  subgraph frontend["Frontend (View)"]
+    VWeb[Web Pages]
+    VForms[Formulários]
+    VTemplates[Templates]
+  end
+
+  %% Controllers
+  subgraph controllers["Controllers"]
+    CCliente[ClienteController]
+    CPedido[PedidoController]
+    CContrato[ContratoController]
+    CAuth[AuthController]
+    CAgente[AgenteController]
+  end
+
+  %% Security Layer
+  subgraph security["Security"]
+    SConfig[SecurityConfig]
+    SJWT[JWT Filter]
+    SProvider[Auth Provider]
+    SUserDetails[UserDetailsService]
+  end
+
+  %% Services
+  subgraph services["Services"]
+    SCliente[ClienteService]
+    SPedido[PedidoService]
+    SContrato[ContratoService]
+    SAuth[AuthService]
+    SAgente[AgenteService]
+  end
+
+  %% Repositories
+  subgraph repositories["Repositories"]
+    RCliente[ClienteRepository]
+    RPedido[PedidoRepository]
+    RContrato[ContratoRepository]
+    RAutomovel[AutomovelRepository]
+    RAgente[AgenteRepository]
+    RBanco[BancoRepository]
+  end
+
+  %% Models
+  subgraph models["Models"]
+    MCliente[Cliente]
+    MPedido[Pedido]
+    MContrato[Contrato]
+    MAutomovel[Automovel]
+    MAgente[Agente]
+    MBanco[Banco]
+  end
+
+  %% DTOs
+  subgraph dtos["DTOs"]
+    DCliente[ClienteDTO]
+    DPedido[PedidoDTO]
+    DContrato[ContratoDTO]
+    DAuth[AuthDTO]
+  end
+
+  %% Resources
+  subgraph resources["Resources"]
+    RStatic[Static Resources]
+    RConfig[Configuration Files]
+    RTemplates[Templates]
+  end
+
+  %% Relações
+  frontend -->|requisições| controllers
+  controllers -->|usa| services
+  controllers -->|retorna views| frontend
+  security -->|protege| controllers
+  security -->|autentica| services
+  services -->|acessa| repositories
+  services -->|manipula| models
+  repositories -->|persiste| models
+  services -->|converte| dtos
+  controllers -->|envia/recebe| dtos
+  resources -->|suporta| frontend
