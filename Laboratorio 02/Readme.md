@@ -63,7 +63,7 @@
 
 ## Diagrama de Componentes
 
-![Imagem Diagrama de Componentes](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio%2002/Diagrama%20de%20Componentes.pdf)
+![Imagem Diagrama de Componentes](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio%2002/Diagrama%20de%20Componentes.png)
 
 ## 🔎 Diagrama da Pacote
 ```mermaid
