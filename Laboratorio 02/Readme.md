@@ -61,6 +61,10 @@
 ## 📦 Diagrama de Casos de Uso do Sistema  
 ![Imagem Diagrama de Casos de Uso](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio%2002/CasoUso-Lab2-2.png)
 
+## Diagrama de Componentes
+
+![Imagem Diagrama de Componentes](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio%2002/Diagrama%20de%20Componentes.pdf)
+
 ## 🔎 Diagrama da Pacote
 ```mermaid
 graph TB
