@@ -1,6 +1,5 @@
 package com.example.Aluguel.dto;
 
-
 import lombok.*;
 import jakarta.validation.constraints.*;
 
@@ -9,18 +8,7 @@ import jakarta.validation.constraints.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ClienteDTO {
-    private Long id;
-
-    @NotBlank
-    private String cpf;
-
-    @NotBlank
-    private String nome;
-
-    @NotBlank
-    private String endereco;
-
+public class AlterarSenhaDTO {
     @Email
     @NotBlank
     private String email;
@@ -28,3 +16,5 @@ public class ClienteDTO {
     @NotBlank
     private String password;
 }
+
+

@@ -1,14 +1,13 @@
 package com.example.Aluguel.repository;
 
-import com.example.Aluguel.entities.Cliente;
+import com.example.Aluguel.entities.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface ClienteRepository extends JpaRepository<Cliente, Long> {
-    Optional<Cliente> findByCpf(String cpf);
-    boolean existsByCpf(String cpf);
+public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+    Optional<Usuario> findByEmail(String email);
     boolean existsByEmail(String email);
 }

@@ -1,50 +1,59 @@
 package com.example.Aluguel.entities;
 
-
 import jakarta.persistence.*;
 import lombok.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "pedidos_aluguel")
+@Table(name = "contratos_aluguel")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PedidoAluguel {
+public class ContratoAluguel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cliente_id", nullable = false)
-    private Cliente cliente;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pedido_id", nullable = false)
+    private PedidoAluguel pedido;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "automovel_id", nullable = false)
-    private Automovel automovel;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "agente_id")
+    @JoinColumn(name = "agente_id", nullable = false)
     private Agente agente;
+
+    @Column(nullable = false)
+    private String numeroContrato;
+
+    @Column(nullable = false)
+    private BigDecimal valorMensal;
+
+    @Column(nullable = false)
+    private Integer prazoMeses;
+
+    @Column(nullable = false)
+    private LocalDateTime dataInicio;
+
+    @Column(nullable = false)
+    private LocalDateTime dataFim;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private StatusPedido status;
+    private StatusContrato status;
 
     @Column(nullable = false)
     private LocalDateTime dataCriacao;
 
     private LocalDateTime dataModificacao;
 
-    private Boolean possuiContratoCredito;
+    private String observacoes;
 
-    private String bancoContrato;
-
-    public enum StatusPedido {
-        PENDENTE, ANALISE_FINANCEIRA, APROVADO, REPROVADO, CONTRATADO, CANCELADO
+    public enum StatusContrato {
+        ATIVO, FINALIZADO, CANCELADO, SUSPENSO
     }
 
     @PrePersist

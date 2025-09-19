@@ -2,26 +2,19 @@ package com.example.Aluguel.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table(name = "clientes")
+@DiscriminatorValue("CLIENTE")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Cliente {
+@SuperBuilder
+public class Cliente extends Usuario {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String cpf;
 
-    @Column(nullable = false)
-    private String nome;
-
-    @Column(nullable = false)
     private String endereco;
 }
