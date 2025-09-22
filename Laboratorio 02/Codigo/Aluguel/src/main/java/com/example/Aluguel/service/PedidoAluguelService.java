@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,7 @@ public class PedidoAluguelService {
                 .cliente(cliente)
                 .automovel(automovel)
                 .status(PedidoAluguel.StatusPedido.PENDENTE)
+                .dataCriacao(pedidoDTO.getDataCriacao())
                 .possuiContratoCredito(pedidoDTO.getPossuiContratoCredito())
                 .bancoContrato(pedidoDTO.getBancoContrato())
                 .build();
@@ -66,8 +68,8 @@ public class PedidoAluguelService {
         }
 
         // Atualizar campos permitidos
-        pedido.setPossuiContratoCredito(pedidoDTO.getPossuiContratoCredito());
-        pedido.setBancoContrato(pedidoDTO.getBancoContrato());
+        pedido.setDataModificacao(LocalDateTime.now());
+        pedido.setStatus(PedidoAluguel.StatusPedido.valueOf(pedidoDTO.getStatus().toUpperCase()));
 
         PedidoAluguel updatedPedido = pedidoRepository.save(pedido);
         return convertToDTO(updatedPedido);
@@ -83,6 +85,7 @@ public class PedidoAluguelService {
         }
 
         pedido.setStatus(PedidoAluguel.StatusPedido.CANCELADO);
+        pedido.setDataModificacao(LocalDateTime.now());
         pedidoRepository.save(pedido);
     }
 
