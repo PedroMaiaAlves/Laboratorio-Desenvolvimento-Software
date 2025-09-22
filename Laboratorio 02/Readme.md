@@ -65,6 +65,10 @@
 
 ![Imagem Diagrama de Componentes](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio%2002/Diagrama%20de%20Componentes.png)
 
+## Diagrama de Implantação
+
+![Diagrama  de Implantação](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio%2002/Diagrama%20de%20Implanta%C3%A7%C3%A3o%20Lab%202.png)
+
 ## 🔎 Diagrama da Pacote
 ```mermaid
 graph TB
