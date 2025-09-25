@@ -37,7 +37,15 @@ function login(event) {
     .then(data => {
         localStorage.setItem('token', data.token);
         localStorage.setItem('role', data.role);
-        window.location.href = '/veiculos.html';
+
+        // Redirecionar conforme a role do usuário
+        if (data.role === 'CLIENTE') {
+            window.location.href = '/veiculos.html';
+        } else if (data.role === 'AGENTE') {
+            window.location.href = '/painel-agente.html';
+        } else {
+            window.location.href = '/index.html'; // fallback
+        }
     })
     .catch(error => {
         document.getElementById('errorMessage').textContent = 'Email ou senha inválidos';
@@ -51,9 +59,16 @@ function register(event) {
     const nome = document.getElementById('nome').value;
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    const tipo = document.getElementById('tipo').value;
+    const tipo = document.getElementById('tipo').value; // "CLIENTE" ou "AGENTE"
 
-    fetch('/auth/register', {
+    let endpoint = '';
+    if (tipo === 'CLIENTE') {
+        endpoint = '/cliente/cadastrar';
+    } else if (tipo === 'AGENTE') {
+        endpoint = '/agentes/cadastrar';
+    }
+
+    fetch(endpoint, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -61,8 +76,7 @@ function register(event) {
         body: JSON.stringify({
             nome: nome,
             email: email,
-            senha: password,
-            tipo: tipo
+            senha: password
         })
     })
     .then(response => {
