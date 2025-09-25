@@ -1,25 +1,34 @@
 package com.example.Aluguel.controller;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.Aluguel.dto.AlterarSenhaDTO;
 import com.example.Aluguel.dto.LoginDTO;
 import com.example.Aluguel.dto.TokenDTO;
-import com.example.Aluguel.dto.AlterarSenhaDTO;
 import com.example.Aluguel.entities.Admin;
 import com.example.Aluguel.entities.Agente;
 import com.example.Aluguel.entities.Cliente;
 import com.example.Aluguel.entities.Usuario;
 import com.example.Aluguel.repository.UsuarioRepository;
 import com.example.Aluguel.service.UsuarioService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@CrossOrigin(origins = {"http://localhost:8000", "http://localhost:3000", "http://127.0.0.1:8000", "file://"})
 public class AuthController {
 
     private final UsuarioService usuarioService;
