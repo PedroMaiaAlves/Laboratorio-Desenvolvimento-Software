@@ -1,6 +1,5 @@
-const token = localStorage.getItem('token');
-
 function getHeaders() {
+    const token = localStorage.getItem('token');
     return {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
@@ -33,7 +32,10 @@ function listarVeiculos() {
             tableBody.innerHTML += row;
         });
     })
-    .catch(error => console.error('Erro ao listar veículos:', error));
+    .catch(error => {
+        console.error('Erro ao listar veículos:', error);
+        alert('Erro ao carregar a lista de veículos. Por favor, recarregue a página.');
+    });
 }
 
 function salvarVeiculo(event) {
@@ -63,7 +65,10 @@ function salvarVeiculo(event) {
         listarVeiculos();
         document.getElementById('veiculoForm').reset();
     })
-    .catch(error => console.error('Erro ao salvar veículo:', error));
+    .catch(error => {
+        console.error('Erro ao salvar veículo:', error);
+        alert('Erro ao salvar o veículo. Por favor, tente novamente.');
+    });
 }
 
 function editarVeiculo(id) {
@@ -100,7 +105,4 @@ function novoVeiculo() {
     $('#veiculoModal').modal('show');
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    listarVeiculos();
-    document.getElementById('veiculoForm').addEventListener('submit', salvarVeiculo);
-});
+// Inicialização é feita pelo jQuery no HTML
