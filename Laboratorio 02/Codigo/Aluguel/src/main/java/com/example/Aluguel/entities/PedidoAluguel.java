@@ -44,7 +44,7 @@ public class PedidoAluguel {
     private String bancoContrato;
 
     public enum StatusPedido {
-        PENDENTE, ANALISE_FINANCEIRA, APROVADO, REPROVADO, CONTRATADO, CANCELADO
+        PENDENTE, ANALISE_FINANCEIRA, APROVADO, REJEITADO, CONTRATADO, CANCELADO
     }
 
     @PrePersist

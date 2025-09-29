@@ -97,7 +97,7 @@ public class PedidoAluguelService {
                 .orElseThrow(() -> new RuntimeException("Agente não encontrado"));
 
         // Atualizar status do pedido
-        pedido.setStatus(aprovado ? PedidoAluguel.StatusPedido.APROVADO : PedidoAluguel.StatusPedido.REPROVADO);
+        pedido.setStatus(aprovado ? PedidoAluguel.StatusPedido.APROVADO : PedidoAluguel.StatusPedido.REJEITADO);
         pedido.setAgente(agente);
         pedidoRepository.save(pedido);
 
