@@ -60,4 +60,22 @@ public class AgenteController {
         AgenteDTO agente = agenteService.autenticarAgente(loginDTO.getEmail(), loginDTO.getPassword());
         return ResponseEntity.ok(agente);
     }
+
+    @GetMapping("/debug/{id}")
+    public ResponseEntity<Object> debugAgente(@PathVariable Long id) {
+        try {
+            AgenteDTO agente = agenteService.buscarPorId(id);
+            return ResponseEntity.ok(java.util.Map.of(
+                "agente", agente,
+                "nome", agente.getNome(),
+                "tipoAgente", agente.getTipoAgente(),
+                "id", agente.getId()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.ok(java.util.Map.of(
+                "erro", e.getMessage(),
+                "agenteId", id
+            ));
+        }
+    }
 }

@@ -170,6 +170,16 @@ class ApiService {
         });
     }
 
+    async cadastrarClienteComRendimento(clienteData) {
+        return await this.request('/cliente/cadastrar-com-rendimento', {
+            method: 'POST',
+            body: JSON.stringify(clienteData),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    }
+
     async listarClientes() {
         return await this.request('/cliente/listar');
     }
@@ -246,6 +256,78 @@ class ApiService {
 
     async listarPedidosPorStatus(status) {
         return await this.request(`/pedidos/status/${status}`);
+    }
+
+    async listarPedidosGerenciaveisPorAgente(agenteId) {
+        return await this.request(`/pedidos/agente/${agenteId}/gerenciaveis`);
+    }
+
+    async listarPedidosPorAgente(agenteId) {
+        return await this.request(`/pedidos/agente/${agenteId}`);
+    }
+
+    async listarTodosPedidos() {
+        return await this.request(`/pedidos/todos`);
+    }
+
+    async atualizarDetalhesPedido(id, pedidoData) {
+        return await this.request(`/pedidos/${id}/atualizar-detalhes`, {
+            method: 'PUT',
+            body: JSON.stringify(pedidoData)
+        });
+    }
+
+    async modificarPedidoCompleto(id, pedidoData, gestorId) {
+        const params = gestorId ? `?gestorId=${gestorId}` : '';
+        return await this.request(`/pedidos/${id}/modificar-completo${params}`, {
+            method: 'PUT',
+            body: JSON.stringify(pedidoData)
+        });
+    }
+
+    // Métodos de rendimentos
+    async criarRendimento(rendimentoData) {
+        return await this.request('/rendimentos/criar', {
+            method: 'POST',
+            body: JSON.stringify(rendimentoData)
+        });
+    }
+
+    async listarRendimentosPorCliente(clienteId) {
+        return await this.request(`/rendimentos/cliente/${clienteId}`);
+    }
+
+    async atualizarRendimento(id, rendimentoData) {
+        return await this.request(`/rendimentos/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(rendimentoData)
+        });
+    }
+
+    async deletarRendimento(id) {
+        return await this.request(`/rendimentos/${id}`, {
+            method: 'DELETE'
+        });
+    }
+
+    async debugRendimentos() {
+        return await this.request('/rendimentos/debug');
+    }
+
+    async buscarContratoPorPedido(pedidoId) {
+        return await this.request(`/pedidos/${pedidoId}/contrato`);
+    }
+
+    async obterClientePorId(clienteId) {
+        return await this.request(`/cliente/${clienteId}`);
+    }
+
+    async obterAutomovelPorId(automovelId) {
+        return await this.request(`/automoveis/${automovelId}`);
+    }
+
+    async obterAgentePorId(agenteId) {
+        return await this.request(`/agentes/${agenteId}`);
     }
 
     // Métodos de automóveis

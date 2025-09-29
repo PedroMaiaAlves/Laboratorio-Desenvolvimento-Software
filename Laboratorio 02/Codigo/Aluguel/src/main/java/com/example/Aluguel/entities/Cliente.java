@@ -1,7 +1,15 @@
 package com.example.Aluguel.entities;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
@@ -17,4 +25,13 @@ public class Cliente extends Usuario {
     private String cpf;
 
     private String endereco;
+    
+    // Campos adicionais para contrato de aluguel
+    private String rg;
+    
+    private String profissao;
+    
+    // Relacionamento com rendimentos (máximo 3)
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private java.util.List<Rendimento> rendimentos;
 }

@@ -62,14 +62,8 @@ class AdminPage {
 
     async carregarTodosPedidos() {
         try {
-            const statusList = ['PENDENTE', 'APROVADO', 'REJEITADO', 'CONTRATADO', 'CANCELADO'];
-            this.pedidos = [];
-            
-            for (const status of statusList) {
-                const pedidosStatus = await apiService.listarPedidosPorStatus(status);
-                this.pedidos = this.pedidos.concat(pedidosStatus);
-            }
-            
+            // Usar o novo endpoint que retorna todos os pedidos de uma vez
+            this.pedidos = await apiService.listarTodosPedidos();
             this.renderPedidos();
         } catch (error) {
             console.error('Erro ao carregar pedidos:', error);
@@ -522,6 +516,9 @@ class AdminPage {
     // Métodos de CRUD para Agentes
     async criarAgente() {
         const nome = document.getElementById('agente-nome').value;
+        const cnpj = document.getElementById('agente-cnpj').value;
+        const endereco = document.getElementById('agente-endereco').value;
+        const telefone = document.getElementById('agente-telefone').value;
         const email = document.getElementById('agente-email').value;
         const senha = document.getElementById('agente-senha').value;
         const tipo = document.getElementById('agente-tipo').value;
@@ -529,6 +526,21 @@ class AdminPage {
         // Validações
         if (!nome.trim()) {
             authService.showMessage('Por favor, insira o nome do agente.', 'warning');
+            return;
+        }
+
+        if (!cnpj.trim()) {
+            authService.showMessage('Por favor, insira o CNPJ.', 'warning');
+            return;
+        }
+
+        if (!endereco.trim()) {
+            authService.showMessage('Por favor, insira o endereço.', 'warning');
+            return;
+        }
+
+        if (!telefone.trim()) {
+            authService.showMessage('Por favor, insira o telefone.', 'warning');
             return;
         }
 
@@ -543,21 +555,24 @@ class AdminPage {
         }
 
         if (!tipo) {
-            authService.showMessage('Por favor, selecione o tipo do agente.', 'warning');
+            authService.showMessage('Por favor, selecione o tipo do gestor.', 'warning');
             return;
         }
 
         try {
             const agenteData = {
                 nome: nome.trim(),
+                cnpj: cnpj.trim(),
+                endereco: endereco.trim(),
+                telefone: telefone.trim(),
                 email: email.trim(),
                 password: senha,
-                tipo: tipo,
+                tipoAgente: tipo,
                 ativo: true
             };
 
             await apiService.cadastrarAgente(agenteData);
-            authService.showMessage('Agente criado com sucesso!', 'success');
+            authService.showMessage(`Gestor ${tipo} criado com sucesso!`, 'success');
             
             // Fechar modal e recarregar dados
             const modal = bootstrap.Modal.getInstance(document.getElementById('novoAgenteModal'));
@@ -568,7 +583,7 @@ class AdminPage {
             this.renderAgentes();
             this.atualizarEstatisticas();
         } catch (error) {
-            authService.showMessage('Erro ao criar agente: ' + error.message, 'danger');
+            authService.showMessage('Erro ao criar gestor: ' + error.message, 'danger');
         }
     }
 

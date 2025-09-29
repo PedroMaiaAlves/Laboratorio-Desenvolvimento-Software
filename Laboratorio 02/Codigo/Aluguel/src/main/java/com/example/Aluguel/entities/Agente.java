@@ -51,6 +51,6 @@ public class Agente {
     private String password;
 
     public enum TipoAgente {
-        BANCO, EMPRESA_FINANCEIRA, LOCADORA
+        BANCO, EMPRESA_FINANCEIRA, GESTOR
     }
 }

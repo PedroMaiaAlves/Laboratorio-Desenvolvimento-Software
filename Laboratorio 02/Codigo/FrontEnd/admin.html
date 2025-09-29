@@ -377,25 +377,60 @@
                 </div>
                 <div class="modal-body">
                     <form id="novo-agente-form">
-                        <div class="mb-3">
-                            <label for="agente-nome" class="form-label">Nome</label>
-                            <input type="text" class="form-control" id="agente-nome" required>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="agente-nome" class="form-label">Nome</label>
+                                    <input type="text" class="form-control" id="agente-nome" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="agente-cnpj" class="form-label">CNPJ</label>
+                                    <input type="text" class="form-control" id="agente-cnpj" required 
+                                           placeholder="00.000.000/0000-00">
+                                </div>
+                            </div>
                         </div>
                         <div class="mb-3">
-                            <label for="agente-email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="agente-email" required>
+                            <label for="agente-endereco" class="form-label">Endereço</label>
+                            <input type="text" class="form-control" id="agente-endereco" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="agente-telefone" class="form-label">Telefone</label>
+                                    <input type="text" class="form-control" id="agente-telefone" required
+                                           placeholder="(11) 99999-9999">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="agente-email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="agente-email" required>
+                                </div>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="agente-senha" class="form-label">Senha</label>
                             <input type="password" class="form-control" id="agente-senha" required>
                         </div>
                         <div class="mb-3">
-                            <label for="agente-tipo" class="form-label">Tipo</label>
+                            <label for="agente-tipo" class="form-label">Tipo de Gestor</label>
                             <select class="form-select" id="agente-tipo" required>
                                 <option value="">Selecione o tipo</option>
-                                <option value="BANCO">Banco</option>
-                                <option value="EMPRESA">Empresa</option>
+                                <option value="BANCO">Banco (Financia pedidos)</option>
+                                <option value="EMPRESA_FINANCEIRA">Empresa Financeira (Financia pedidos)</option>
+                                <option value="GESTOR">Gestor Comum (Pedidos diretos)</option>
                             </select>
+                        </div>
+                        <div class="alert alert-info">
+                            <small>
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Tipos de Gestores:</strong><br>
+                                • <strong>Banco/Empresa Financeira:</strong> Gerenciam pedidos com contrato de crédito<br>
+                                • <strong>Gestor Comum:</strong> Gerencia pedidos diretos (sem financiamento)
+                            </small>
                         </div>
                     </form>
                 </div>
