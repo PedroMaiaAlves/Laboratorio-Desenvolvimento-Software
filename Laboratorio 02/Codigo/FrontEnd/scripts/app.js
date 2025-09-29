@@ -86,6 +86,14 @@ class App {
                 case 'perfil':
                     if (authService.isAuthenticated()) {
                         await this.loadUserProfile();
+                        // Carregar rendimentos se for cliente
+                        if (authService.hasRole('CLIENTE')) {
+                            const user = authService.getCurrentUser();
+                            const clienteData = await apiService.obterUsuarioLogado(user.email);
+                            if (clienteData && clienteData.id) {
+                                await rendimentosService.carregarRendimentos(clienteData.id);
+                            }
+                        }
                     }
                     break;
             }
@@ -120,6 +128,12 @@ class App {
                 }
                 if (userData.endereco) {
                     document.getElementById('perfil-endereco').value = userData.endereco;
+                }
+                if (userData.rg) {
+                    document.getElementById('perfil-rg').value = userData.rg;
+                }
+                if (userData.profissao) {
+                    document.getElementById('perfil-profissao').value = userData.profissao;
                 }
                 
                 // Se for agente, mostrar campos específicos

@@ -62,6 +62,22 @@ class AuthService {
         }
     }
 
+    async registerComRendimento(clienteData) {
+        try {
+            await apiService.cadastrarClienteComRendimento(clienteData);
+            let mensagem = 'Cadastro realizado com sucesso!';
+            if (clienteData.empresa && clienteData.salario) {
+                mensagem += ' Rendimento inicial também foi cadastrado.';
+            }
+            mensagem += ' Faça login para continuar.';
+            this.showMessage(mensagem, 'success');
+            return true;
+        } catch (error) {
+            this.showMessage('Erro ao cadastrar: ' + error.message, 'danger');
+            return false;
+        }
+    }
+
     async alterarSenha(email, novaSenha) {
         try {
             await apiService.alterarSenha(email, novaSenha);
@@ -254,10 +270,14 @@ async function handleRegister(event) {
     const nome = document.getElementById('reg-nome').value;
     const cpf = document.getElementById('reg-cpf').value;
     const endereco = document.getElementById('reg-endereco').value;
+    const rg = document.getElementById('reg-rg').value;
+    const profissao = document.getElementById('reg-profissao').value;
     const email = document.getElementById('reg-email').value;
     const password = document.getElementById('reg-password').value;
+    const empresa = document.getElementById('reg-empresa').value;
+    const salario = document.getElementById('reg-salario').value;
     
-    // Validações
+    // Validações obrigatórias
     if (!nome.trim()) {
         authService.showMessage('Por favor, insira seu nome completo.', 'warning');
         return;
@@ -270,6 +290,16 @@ async function handleRegister(event) {
     
     if (!endereco.trim()) {
         authService.showMessage('Por favor, insira seu endereço.', 'warning');
+        return;
+    }
+    
+    if (!rg.trim()) {
+        authService.showMessage('Por favor, insira seu RG.', 'warning');
+        return;
+    }
+    
+    if (!profissao.trim()) {
+        authService.showMessage('Por favor, insira sua profissão.', 'warning');
         return;
     }
     
@@ -287,11 +317,19 @@ async function handleRegister(event) {
         nome: nome.trim(),
         cpf: authService.formatCPF(cpf),
         endereco: endereco.trim(),
+        rg: rg.trim(),
+        profissao: profissao.trim(),
         email: email.trim(),
         password: password
     };
     
-    const success = await authService.register(clienteData);
+    // Adicionar rendimento se foi fornecido
+    if (empresa.trim() && salario && parseFloat(salario) > 0) {
+        clienteData.empresa = empresa.trim();
+        clienteData.salario = parseFloat(salario);
+    }
+    
+    const success = await authService.registerComRendimento(clienteData);
     if (success) {
         showPage('login');
         // Limpar formulário
