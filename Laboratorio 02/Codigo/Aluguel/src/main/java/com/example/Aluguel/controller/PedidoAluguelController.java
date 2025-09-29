@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.Aluguel.dto.ContratoAluguelDTO;
 import com.example.Aluguel.dto.PedidoAluguelDTO;
 import com.example.Aluguel.service.PedidoAluguelService;
 
@@ -50,6 +51,21 @@ public class PedidoAluguelController {
         return ResponseEntity.ok(updatedPedido);
     }
 
+    @PutMapping("/{id}/atualizar-detalhes")
+    public ResponseEntity<PedidoAluguelDTO> atualizarDetalhesPedido(@PathVariable Long id, @RequestBody PedidoAluguelDTO pedidoDTO) {
+        PedidoAluguelDTO updatedPedido = pedidoService.atualizarDetalhesPedido(id, pedidoDTO);
+        return ResponseEntity.ok(updatedPedido);
+    }
+
+    @PutMapping("/{id}/modificar-completo")
+    public ResponseEntity<PedidoAluguelDTO> modificarPedidoCompleto(
+            @PathVariable Long id, 
+            @RequestBody PedidoAluguelDTO pedidoDTO,
+            @RequestParam(required = false) Long gestorId) {
+        PedidoAluguelDTO updatedPedido = pedidoService.modificarPedidoCompleto(id, pedidoDTO, gestorId);
+        return ResponseEntity.ok(updatedPedido);
+    }
+
     @PutMapping("/{id}/cancelar")
     public ResponseEntity<Void> cancelarPedido(@PathVariable Long id) {
         pedidoService.cancelarPedido(id);
@@ -80,5 +96,79 @@ public class PedidoAluguelController {
     public ResponseEntity<List<PedidoAluguelDTO>> listarPedidosPorStatus(@PathVariable String status) {
         List<PedidoAluguelDTO> pedidos = pedidoService.listarPedidosPorStatus(status);
         return ResponseEntity.ok(pedidos);
+    }
+
+    @GetMapping("/agente/{agenteId}/gerenciaveis")
+    public ResponseEntity<List<PedidoAluguelDTO>> listarPedidosGerenciaveisPorAgente(@PathVariable Long agenteId) {
+        List<PedidoAluguelDTO> pedidos = pedidoService.listarPedidosGerenciaveisPorAgente(agenteId);
+        return ResponseEntity.ok(pedidos);
+    }
+
+    @GetMapping("/agente/{agenteId}")
+    public ResponseEntity<List<PedidoAluguelDTO>> listarPedidosPorAgente(@PathVariable Long agenteId) {
+        List<PedidoAluguelDTO> pedidos = pedidoService.listarPedidosPorAgente(agenteId);
+        return ResponseEntity.ok(pedidos);
+    }
+
+    @GetMapping("/todos")
+    public ResponseEntity<List<PedidoAluguelDTO>> listarTodosPedidos() {
+        List<PedidoAluguelDTO> pedidos = pedidoService.listarTodosPedidos();
+        return ResponseEntity.ok(pedidos);
+    }
+
+    @GetMapping("/debug/agente/{agenteId}")
+    public ResponseEntity<Object> debugPedidosAgente(@PathVariable Long agenteId) {
+        try {
+            List<PedidoAluguelDTO> pedidosGerenciaveis = pedidoService.listarPedidosGerenciaveisPorAgente(agenteId);
+            List<PedidoAluguelDTO> todosPedidos = pedidoService.listarTodosPedidos();
+            
+            return ResponseEntity.ok(java.util.Map.of(
+                "agenteId", agenteId,
+                "pedidosGerenciaveis", pedidosGerenciaveis,
+                "totalPedidos", todosPedidos.size(),
+                "todosPedidos", todosPedidos
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.ok(java.util.Map.of(
+                "erro", e.getMessage(),
+                "agenteId", agenteId
+            ));
+        }
+    }
+
+    @GetMapping("/debug/banco/{bancoId}")
+    public ResponseEntity<Object> debugPedidosPorBanco(@PathVariable String bancoId) {
+        try {
+            List<PedidoAluguelDTO> pedidos = pedidoService.listarTodosPedidos();
+            List<PedidoAluguelDTO> pedidosComCredito = pedidos.stream()
+                .filter(p -> p.getPossuiContratoCredito() != null && p.getPossuiContratoCredito())
+                .collect(java.util.stream.Collectors.toList());
+            
+            List<PedidoAluguelDTO> pedidosDoBanco = pedidos.stream()
+                .filter(p -> bancoId.equals(p.getBancoContrato()))
+                .collect(java.util.stream.Collectors.toList());
+            
+            return ResponseEntity.ok(java.util.Map.of(
+                "bancoId", bancoId,
+                "totalPedidos", pedidos.size(),
+                "pedidosComCredito", pedidosComCredito,
+                "pedidosDoBanco", pedidosDoBanco
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.ok(java.util.Map.of(
+                "erro", e.getMessage(),
+                "bancoId", bancoId
+            ));
+        }
+    }
+
+    @GetMapping("/{pedidoId}/contrato")
+    public ResponseEntity<Object> buscarContratoPorPedido(@PathVariable Long pedidoId) {
+        try {
+            ContratoAluguelDTO contrato = pedidoService.buscarContratoPorPedido(pedidoId);
+            return ResponseEntity.ok(contrato);
+        } catch (Exception e) {
+            return ResponseEntity.ok(java.util.Map.of("erro", e.getMessage()));
+        }
     }
 }

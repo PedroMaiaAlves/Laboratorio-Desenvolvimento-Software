@@ -1,8 +1,13 @@
 package com.example.Aluguel.dto;
 
 
-import lombok.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -27,4 +32,12 @@ public class ClienteDTO {
 
     @NotBlank
     private String password;
+    
+    // Campos adicionais para contrato
+    private String rg;
+    
+    private String profissao;
+    
+    // Lista de rendimentos
+    private java.util.List<RendimentoDTO> rendimentos;
 }
