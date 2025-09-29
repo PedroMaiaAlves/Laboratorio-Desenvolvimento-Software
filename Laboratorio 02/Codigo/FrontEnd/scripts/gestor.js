@@ -197,13 +197,17 @@ class GestorService {
     }
 
     async cadastrarAgente(data) {
+        const tipoAgenteBackend = data.agenteTipo === 'EMPRESA' ? 'EMPRESA_FINANCEIRA' : data.agenteTipo;
+
         const agenteData = {
             nome: data.nome,
             cnpj: data.cnpj || '',
             endereco: data.endereco || '',
             telefone: data.telefone || '',
-            tipoAgente: data.agenteTipo,
-            ativo: data.ativo
+            tipoAgente: tipoAgenteBackend,
+            ativo: data.ativo,
+            email: data.email,
+            password: data.senha
         };
 
         return await apiService.cadastrarAgente(agenteData);
