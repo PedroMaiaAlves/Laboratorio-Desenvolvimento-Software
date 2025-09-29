@@ -8,14 +8,50 @@ class App {
     init() {
         // Configurar event listeners
         this.setupEventListeners();
-        
+
         // Verificar autenticação
         if (authService.isAuthenticated()) {
             authService.updateUI();
         }
-        
+
         // Mostrar página inicial
         this.showPage('home');
+    }
+
+    // Controlar visibilidade dos botões na home page baseado no estado de autenticação
+    updateHomeButtonsVisibility() {
+        const btnEntrar = document.getElementById('btn-entrar');
+        const btnCadastrar = document.getElementById('btn-cadastrar');
+        const btnCriarGestor = document.getElementById('btn-criar-gestor');
+        const btnCadastrarVeiculo = document.getElementById('btn-cadastrar-veiculo');
+
+        const user = authService.getCurrentUser();
+
+        if (!user) {
+            // Usuário deslogado - mostrar todos os botões
+            if (btnEntrar) btnEntrar.style.display = 'inline-block';
+            if (btnCadastrar) btnCadastrar.style.display = 'inline-block';
+            if (btnCriarGestor) btnCriarGestor.style.display = 'inline-block';
+            if (btnCadastrarVeiculo) btnCadastrarVeiculo.style.display = 'inline-block';
+        } else if (user.role === 'CLIENTE') {
+            // Usuário cliente logado - mostrar apenas entrar e cadastrar
+            if (btnEntrar) btnEntrar.style.display = 'none';
+            if (btnCadastrar) btnCadastrar.style.display = 'none';
+            if (btnCriarGestor) btnCriarGestor.style.display = 'none';
+            if (btnCadastrarVeiculo) btnCadastrarVeiculo.style.display = 'none';
+        } else if (user.role === 'AGENTE') {
+            // Usuário agente logado - mostrar apenas cadastrar veículo
+            if (btnEntrar) btnEntrar.style.display = 'none';
+            if (btnCadastrar) btnCadastrar.style.display = 'none';
+            if (btnCriarGestor) btnCriarGestor.style.display = 'none';
+            if (btnCadastrarVeiculo) btnCadastrarVeiculo.style.display = 'inline-block';
+        } else if (user.role === 'ADMIN') {
+            // Usuário admin logado - mostrar apenas cadastrar veículo
+            if (btnEntrar) btnEntrar.style.display = 'none';
+            if (btnCadastrar) btnCadastrar.style.display = 'none';
+            if (btnCriarGestor) btnCriarGestor.style.display = 'none';
+            if (btnCadastrarVeiculo) btnCadastrarVeiculo.style.display = 'inline-block';
+        }
     }
 
     setupEventListeners() {
@@ -56,6 +92,11 @@ class App {
 
             // Carregar dados específicos da página
             await this.loadPageData(pageName);
+
+            // Atualizar visibilidade dos botões na home page
+            if (pageName === 'home') {
+                this.updateHomeButtonsVisibility();
+            }
         } else {
             console.error(`Página ${pageName} não encontrada`);
         }

@@ -12,6 +12,11 @@ class AuthService {
             this.currentUser = JSON.parse(userData);
             this.updateUI();
         }
+
+        // Atualizar visibilidade dos botões na home page
+        if (window.app && window.app.updateHomeButtonsVisibility) {
+            window.app.updateHomeButtonsVisibility();
+        }
     }
 
     async login(email, password) {
@@ -21,8 +26,12 @@ class AuthService {
                 email: response.username,
                 role: response.role
             };
-            
+
             this.updateUI();
+            // Atualizar visibilidade dos botões na home page
+            if (window.app && window.app.updateHomeButtonsVisibility) {
+                window.app.updateHomeButtonsVisibility();
+            }
             this.showMessage('Login realizado com sucesso!', 'success');
             return true;
         } catch (error) {
@@ -41,8 +50,12 @@ class AuthService {
                 nome: response.nome,
                 tipoAgente: response.tipoAgente
             };
-            
+
             this.updateUI();
+            // Atualizar visibilidade dos botões na home page
+            if (window.app && window.app.updateHomeButtonsVisibility) {
+                window.app.updateHomeButtonsVisibility();
+            }
             this.showMessage(`Login realizado com sucesso! Bem-vindo, ${response.nome}`, 'success');
             return true;
         } catch (error) {
@@ -93,6 +106,10 @@ class AuthService {
         apiService.logout();
         this.currentUser = null;
         this.updateUI();
+        // Atualizar visibilidade dos botões na home page
+        if (window.app && window.app.updateHomeButtonsVisibility) {
+            window.app.updateHomeButtonsVisibility();
+        }
         this.showMessage('Logout realizado com sucesso!', 'info');
         showPage('home');
     }
