@@ -120,6 +120,29 @@ class ApiService {
         return response;
     }
 
+    async loginAgente(email, password) {
+        const response = await this.request('/agentes/login', {
+            method: 'POST',
+            body: JSON.stringify({ email, password }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        // Para agentes, não temos token JWT, então vamos simular
+        this.token = 'agente_' + response.id;
+        localStorage.setItem('token', this.token);
+        localStorage.setItem('user', JSON.stringify({
+            email: response.email,
+            role: 'AGENTE',
+            id: response.id,
+            nome: response.nome,
+            tipoAgente: response.tipoAgente
+        }));
+        
+        return response;
+    }
+
     async alterarSenha(email, password) {
         return await this.request('/auth/alterar-senha', {
             method: 'PUT',
@@ -270,7 +293,10 @@ class ApiService {
     }
 
     async listarAgentesAtivos() {
-        return await this.request('/agentes/ativos');
+        console.log('Fazendo requisição para /agentes/ativos');
+        const result = await this.request('/agentes/ativos');
+        console.log('Resposta do endpoint /agentes/ativos:', result);
+        return result;
     }
 
     async listarAgentesPorTipo(tipo) {
@@ -368,6 +394,7 @@ class ApiService {
 
             // Baseado no tipo de usuário, buscar nos endpoints específicos
             if (user.role === 'CLIENTE') {
+                // Buscar na tabela clientes (que é referenciada pelos pedidos)
                 const clientes = await this.listarClientes();
                 const cliente = clientes.find(c => c.email === email);
                 return cliente;

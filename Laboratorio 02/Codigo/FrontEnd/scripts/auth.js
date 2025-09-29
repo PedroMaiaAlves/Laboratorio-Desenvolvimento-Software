@@ -31,6 +31,26 @@ class AuthService {
         }
     }
 
+    async loginAgente(email, password) {
+        try {
+            const response = await apiService.loginAgente(email, password);
+            this.currentUser = {
+                email: response.email,
+                role: 'AGENTE',
+                id: response.id,
+                nome: response.nome,
+                tipoAgente: response.tipoAgente
+            };
+            
+            this.updateUI();
+            this.showMessage(`Login realizado com sucesso! Bem-vindo, ${response.nome}`, 'success');
+            return true;
+        } catch (error) {
+            this.showMessage('Erro ao fazer login: ' + error.message, 'danger');
+            return false;
+        }
+    }
+
     async register(clienteData) {
         try {
             await apiService.cadastrarCliente(clienteData);
@@ -204,6 +224,7 @@ async function handleLogin(event) {
     
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
+    const isAgente = document.getElementById('login-agente').checked;
     
     if (!authService.validateEmail(email)) {
         authService.showMessage('Por favor, insira um email válido.', 'warning');
@@ -215,7 +236,13 @@ async function handleLogin(event) {
         return;
     }
     
-    const success = await authService.login(email, password);
+    let success;
+    if (isAgente) {
+        success = await authService.loginAgente(email, password);
+    } else {
+        success = await authService.login(email, password);
+    }
+    
     if (success) {
         showPage('home');
     }

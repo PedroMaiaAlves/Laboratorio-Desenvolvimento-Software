@@ -11,13 +11,20 @@ class PedidosService {
             if (authService.hasRole('CLIENTE')) {
                 // Para clientes, carregar apenas seus pedidos
                 const user = authService.getCurrentUser();
-                // Como não temos o ID do cliente diretamente, vamos carregar todos e filtrar
-                // Em uma implementação real, o backend deveria retornar o ID do cliente no token
-                this.pedidos = await apiService.listarPedidosPorStatus('PENDENTE');
-                this.pedidos = this.pedidos.concat(await apiService.listarPedidosPorStatus('APROVADO'));
-                this.pedidos = this.pedidos.concat(await apiService.listarPedidosPorStatus('REJEITADO'));
-                this.pedidos = this.pedidos.concat(await apiService.listarPedidosPorStatus('CONTRATADO'));
-                this.pedidos = this.pedidos.concat(await apiService.listarPedidosPorStatus('CANCELADO'));
+                if (!user) {
+                    authService.showMessage('Usuário não autenticado. Faça login novamente.', 'danger');
+                    return;
+                }
+
+                // Obter o ID do cliente da tabela usuarios
+                const clienteData = await apiService.obterUsuarioLogado(user.email);
+                if (!clienteData || !clienteData.id) {
+                    authService.showMessage('Erro ao obter dados do cliente. Tente novamente.', 'danger');
+                    return;
+                }
+
+                // Carregar pedidos específicos do cliente
+                this.pedidos = await apiService.consultarPedidosPorCliente(clienteData.id);
             } else if (authService.hasRole('AGENTE') || authService.hasRole('ADMIN')) {
                 // Para agentes e admins, carregar pedidos pendentes para avaliação
                 this.pedidos = await apiService.listarPedidosPorStatus('PENDENTE');
@@ -40,9 +47,24 @@ class PedidosService {
 
     async carregarAgentes() {
         try {
+            console.log('Carregando agentes...');
             this.agentes = await apiService.listarAgentesAtivos();
+            console.log('Agentes carregados:', this.agentes);
+            console.log('Tipo de dados:', typeof this.agentes, 'Array?', Array.isArray(this.agentes));
+            
+            // Teste adicional: verificar se há dados
+            if (!this.agentes || this.agentes.length === 0) {
+                console.warn('Nenhum agente retornado do backend');
+                // Tentar carregar todos os agentes para debug
+                console.log('Tentando carregar todos os agentes...');
+                const todosAgentes = await apiService.listarAgentes();
+                console.log('Todos os agentes:', todosAgentes);
+            }
+            
             this.renderAgentesSelect();
         } catch (error) {
+            console.error('Erro ao carregar agentes:', error);
+            console.error('Detalhes do erro:', error);
             authService.showMessage('Erro ao carregar agentes: ' + error.message, 'danger');
         }
     }
@@ -173,17 +195,33 @@ class PedidosService {
 
     renderAgentesSelect() {
         const select = document.getElementById('pedido-banco');
-        if (!select) return;
+        if (!select) {
+            console.warn('Elemento pedido-banco não encontrado');
+            return;
+        }
 
         select.innerHTML = '<option value="">Selecione um banco</option>';
+        
+        console.log('Renderizando agentes:', this.agentes);
+        
+        let bancosEncontrados = 0;
         this.agentes.forEach(agente => {
-            if (agente.tipo === 'BANCO') {
+            console.log('Verificando agente:', agente.nome, 'tipo:', agente.tipoAgente);
+            if (agente.tipoAgente === 'BANCO') {
                 const option = document.createElement('option');
                 option.value = agente.id;
                 option.textContent = agente.nome;
                 select.appendChild(option);
+                bancosEncontrados++;
+                console.log('Banco adicionado:', agente.nome);
             }
         });
+        
+        console.log(`Total de bancos encontrados: ${bancosEncontrados}`);
+        
+        if (bancosEncontrados === 0) {
+            console.warn('Nenhum banco encontrado nos agentes');
+        }
     }
 
     async criarPedido() {
@@ -202,8 +240,21 @@ class PedidosService {
         }
 
         try {
+            // Obter o ID do cliente da tabela usuarios
+            const user = authService.getCurrentUser();
+            if (!user) {
+                authService.showMessage('Usuário não autenticado. Faça login novamente.', 'danger');
+                return;
+            }
+
+            const clienteData = await apiService.obterUsuarioLogado(user.email);
+            if (!clienteData || !clienteData.id) {
+                authService.showMessage('Erro ao obter dados do cliente. Tente novamente.', 'danger');
+                return;
+            }
+
             const pedidoData = {
-                clienteId: 1, // Em uma implementação real, isso viria do token
+                clienteId: clienteData.id, // Usar o ID correto da tabela usuarios
                 automovelId: parseInt(automovelId),
                 possuiContratoCredito: possuiContratoCredito,
                 bancoContrato: bancoContrato || null,

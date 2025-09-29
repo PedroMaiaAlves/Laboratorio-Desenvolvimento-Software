@@ -44,11 +44,20 @@ class VeiculoService {
     async handleCadastro(event) {
         event.preventDefault();
         
+        // Prevenir duplo envio
+        const submitButton = event.target.querySelector('button[type="submit"]');
+        if (submitButton.disabled) {
+            return; // Já está processando
+        }
+        
         const formData = this.getFormData();
         
         if (!this.validateForm(formData)) {
             return;
         }
+
+        // Desabilitar botão e mostrar loading
+        this.setButtonLoading(submitButton, true);
 
         try {
             const veiculoData = {
@@ -75,7 +84,16 @@ class VeiculoService {
             
         } catch (error) {
             console.error('Erro ao cadastrar veículo:', error);
-            this.showMessage('Erro ao cadastrar veículo: ' + error.message, 'danger');
+            
+            // Verificar se é erro de placa duplicada
+            if (error.message.includes('Duplicate entry') && error.message.includes('placa')) {
+                this.showMessage('Esta placa já está cadastrada no sistema. Por favor, use uma placa diferente.', 'warning');
+            } else {
+                this.showMessage('Erro ao cadastrar veículo: ' + error.message, 'danger');
+            }
+        } finally {
+            // Reabilitar botão
+            this.setButtonLoading(submitButton, false);
         }
     }
 
@@ -273,6 +291,21 @@ class VeiculoService {
 
     limparFormulario() {
         document.getElementById('cadastro-veiculo-form').reset();
+    }
+
+    setButtonLoading(button, loading) {
+        if (loading) {
+            button.disabled = true;
+            button.innerHTML = `
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Cadastrando...
+            `;
+        } else {
+            button.disabled = false;
+            button.innerHTML = `
+                <i class="fas fa-save"></i> Cadastrar Veículo
+            `;
+        }
     }
 
     showMessage(message, type) {

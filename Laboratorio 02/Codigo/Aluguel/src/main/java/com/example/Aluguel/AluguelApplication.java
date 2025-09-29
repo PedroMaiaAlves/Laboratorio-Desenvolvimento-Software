@@ -8,6 +8,7 @@ public class AluguelApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(AluguelApplication.class, args);
+		System.out.println("Começou");
 	}
 
 }

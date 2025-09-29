@@ -83,6 +83,21 @@ class AdminPage {
         document.getElementById('total-pedidos').textContent = this.pedidos.length;
     }
 
+    setButtonLoading(button, loading) {
+        if (loading) {
+            button.disabled = true;
+            button.innerHTML = `
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Cadastrando...
+            `;
+        } else {
+            button.disabled = false;
+            button.innerHTML = `
+                <i class="fas fa-save"></i> Cadastrar Veículo
+            `;
+        }
+    }
+
     renderClientes() {
         const container = document.getElementById('clientes-list');
         if (!container) return;
@@ -404,6 +419,12 @@ class AdminPage {
 
     // Métodos de CRUD para Automóveis
     async criarVeiculo() {
+        // Prevenir duplo envio
+        const submitButton = document.querySelector('#novo-veiculo-form button[type="submit"]');
+        if (submitButton && submitButton.disabled) {
+            return; // Já está processando
+        }
+
         const placa = document.getElementById('veiculo-placa').value;
         const matricula = document.getElementById('veiculo-matricula').value;
         const ano = document.getElementById('veiculo-ano').value;
@@ -437,6 +458,11 @@ class AdminPage {
             return;
         }
 
+        // Desabilitar botão e mostrar loading
+        if (submitButton) {
+            this.setButtonLoading(submitButton, true);
+        }
+
         try {
             const automovelData = {
                 placa: placa.trim(),
@@ -459,7 +485,17 @@ class AdminPage {
             this.renderAutomoveis();
             this.atualizarEstatisticas();
         } catch (error) {
-            authService.showMessage('Erro ao criar veículo: ' + error.message, 'danger');
+            // Verificar se é erro de placa duplicada
+            if (error.message.includes('Duplicate entry') && error.message.includes('placa')) {
+                authService.showMessage('Esta placa já está cadastrada no sistema. Por favor, use uma placa diferente.', 'warning');
+            } else {
+                authService.showMessage('Erro ao criar veículo: ' + error.message, 'danger');
+            }
+        } finally {
+            // Reabilitar botão
+            if (submitButton) {
+                this.setButtonLoading(submitButton, false);
+            }
         }
     }
 
