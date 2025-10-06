@@ -124,7 +124,7 @@ O sistema envolve três principais perfis de usuários: **aluno**, **professor**
 
 ## Diagrama de Componentes
 
-![Imagem Diagrama de Componentes](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio%2002/Diagrama%20de%20Componentes.png)
+![Imagem Diagrama de Componentes](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio%2003/Diagrama%20Componentes%20Lab%203.png)
 
 ## Diagrama de Implantação
 
