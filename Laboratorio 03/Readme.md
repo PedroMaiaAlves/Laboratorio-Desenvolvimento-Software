@@ -120,7 +120,7 @@ O sistema envolve três principais perfis de usuários: **aluno**, **professor**
 
 
 ## 📦 Diagrama de Casos de Uso do Sistema  
-![Imagem Diagrama de Casos de Uso](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio%2002/CasoUso-Lab2-2.png)
+![Imagem Diagrama de Casos de Uso](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio%2003/Diagrama%20caso%20de%20uso.png)
 
 ## Diagrama de Componentes
 
