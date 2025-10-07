@@ -128,5 +128,95 @@ O sistema envolve três principais perfis de usuários: **aluno**, **professor**
 
 ## Diagrama de Classe
 
-![Diagrama  de Implantação]()
+```mermaid
+classDiagram
+    %% ==== Classes principais ====
+    class Usuario {
+        -String nome
+        -String email
+        -String cpf
+        -String senha
+        +login()
+        +consultarExtrato()
+    }
 
+    class Aluno {
+        -String rg
+        -String endereco
+        -String curso
+        -int saldoMoedas
+        +receberMoedas(int qtd)
+        +trocarMoedas(Vantagem vantagem)
+        +notificarEmail()
+    }
+
+    class Professor {
+        -String departamento
+        -int saldoMoedas
+        +enviarMoedas(Aluno aluno, int qtd, String mensagem)
+        +consultarExtrato()
+    }
+
+    class Empresa {
+        -String cnpj
+        -String nomeFantasia
+        -String email
+        +cadastrarVantagem()
+        +incluirCusto(int moedas)
+    }
+
+    class Vantagem {
+        -String titulo
+        -String descricao
+        -int custoEmMoedas
+        -String foto
+    }
+
+    class Instituicao {
+        -String nome
+        -String cnpj
+        -String endereco
+    }
+
+    class Transacao {
+        -int id
+        -Date data
+        -int quantidade
+        -String tipo  %% "envio" ou "recebimento"
+        -String mensagem
+    }
+
+    class Sistema {
+        +gerarCodigoCupom()
+        +enviarEmail()
+        +autenticarUsuario()
+    }
+
+    %% ==== Relacionamentos ====
+    Usuario <|-- Aluno
+    Usuario <|-- Professor
+    Usuario <|-- Empresa
+
+    Professor --> "1..*" Transacao : envia >
+    Aluno --> "1..*" Transacao : recebe >
+
+    Professor --> "1" Instituicao
+    Aluno --> "1" Instituicao
+
+    Empresa --> "1..*" Vantagem
+    Aluno --> "0..*" Vantagem : troca >
+
+    Sistema --> Usuario : autentica >
+    Sistema --> Empresa : notifica troca >
+```
+
+---
+
+### 🧩 Explicação do modelo:
+- **Usuário** é uma classe abstrata, base para **Aluno**, **Professor** e **Empresa** (todos precisam de login e senha).  
+- **Professor** e **Aluno** têm relação com **Instituição**, pois pertencem a ela.  
+- **Transação** registra as operações de envio e recebimento de moedas.  
+- **Vantagem** representa os benefícios oferecidos pelas empresas.  
+- **Sistema** é uma classe de controle, responsável por autenticação e envio de notificações.  
+
+---
