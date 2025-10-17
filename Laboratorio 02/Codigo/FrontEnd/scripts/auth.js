@@ -12,6 +12,11 @@ class AuthService {
             this.currentUser = JSON.parse(userData);
             this.updateUI();
         }
+
+        // Atualizar visibilidade dos botões na home page
+        if (window.app && window.app.updateHomeButtonsVisibility) {
+            window.app.updateHomeButtonsVisibility();
+        }
     }
 
     async login(email, password) {
@@ -21,9 +26,37 @@ class AuthService {
                 email: response.username,
                 role: response.role
             };
-            
+
             this.updateUI();
+            // Atualizar visibilidade dos botões na home page
+            if (window.app && window.app.updateHomeButtonsVisibility) {
+                window.app.updateHomeButtonsVisibility();
+            }
             this.showMessage('Login realizado com sucesso!', 'success');
+            return true;
+        } catch (error) {
+            this.showMessage('Erro ao fazer login: ' + error.message, 'danger');
+            return false;
+        }
+    }
+
+    async loginAgente(email, password) {
+        try {
+            const response = await apiService.loginAgente(email, password);
+            this.currentUser = {
+                email: response.email,
+                role: 'AGENTE',
+                id: response.id,
+                nome: response.nome,
+                tipoAgente: response.tipoAgente
+            };
+
+            this.updateUI();
+            // Atualizar visibilidade dos botões na home page
+            if (window.app && window.app.updateHomeButtonsVisibility) {
+                window.app.updateHomeButtonsVisibility();
+            }
+            this.showMessage(`Login realizado com sucesso! Bem-vindo, ${response.nome}`, 'success');
             return true;
         } catch (error) {
             this.showMessage('Erro ao fazer login: ' + error.message, 'danger');
@@ -35,6 +68,22 @@ class AuthService {
         try {
             await apiService.cadastrarCliente(clienteData);
             this.showMessage('Cadastro realizado com sucesso! Faça login para continuar.', 'success');
+            return true;
+        } catch (error) {
+            this.showMessage('Erro ao cadastrar: ' + error.message, 'danger');
+            return false;
+        }
+    }
+
+    async registerComRendimento(clienteData) {
+        try {
+            await apiService.cadastrarClienteComRendimento(clienteData);
+            let mensagem = 'Cadastro realizado com sucesso!';
+            if (clienteData.empresa && clienteData.salario) {
+                mensagem += ' Rendimento inicial também foi cadastrado.';
+            }
+            mensagem += ' Faça login para continuar.';
+            this.showMessage(mensagem, 'success');
             return true;
         } catch (error) {
             this.showMessage('Erro ao cadastrar: ' + error.message, 'danger');
@@ -57,6 +106,10 @@ class AuthService {
         apiService.logout();
         this.currentUser = null;
         this.updateUI();
+        // Atualizar visibilidade dos botões na home page
+        if (window.app && window.app.updateHomeButtonsVisibility) {
+            window.app.updateHomeButtonsVisibility();
+        }
         this.showMessage('Logout realizado com sucesso!', 'info');
         showPage('home');
     }
@@ -204,6 +257,7 @@ async function handleLogin(event) {
     
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
+    const isAgente = document.getElementById('login-agente').checked;
     
     if (!authService.validateEmail(email)) {
         authService.showMessage('Por favor, insira um email válido.', 'warning');
@@ -215,7 +269,13 @@ async function handleLogin(event) {
         return;
     }
     
-    const success = await authService.login(email, password);
+    let success;
+    if (isAgente) {
+        success = await authService.loginAgente(email, password);
+    } else {
+        success = await authService.login(email, password);
+    }
+    
     if (success) {
         showPage('home');
     }
@@ -227,10 +287,14 @@ async function handleRegister(event) {
     const nome = document.getElementById('reg-nome').value;
     const cpf = document.getElementById('reg-cpf').value;
     const endereco = document.getElementById('reg-endereco').value;
+    const rg = document.getElementById('reg-rg').value;
+    const profissao = document.getElementById('reg-profissao').value;
     const email = document.getElementById('reg-email').value;
     const password = document.getElementById('reg-password').value;
+    const empresa = document.getElementById('reg-empresa').value;
+    const salario = document.getElementById('reg-salario').value;
     
-    // Validações
+    // Validações obrigatórias
     if (!nome.trim()) {
         authService.showMessage('Por favor, insira seu nome completo.', 'warning');
         return;
@@ -243,6 +307,16 @@ async function handleRegister(event) {
     
     if (!endereco.trim()) {
         authService.showMessage('Por favor, insira seu endereço.', 'warning');
+        return;
+    }
+    
+    if (!rg.trim()) {
+        authService.showMessage('Por favor, insira seu RG.', 'warning');
+        return;
+    }
+    
+    if (!profissao.trim()) {
+        authService.showMessage('Por favor, insira sua profissão.', 'warning');
         return;
     }
     
@@ -260,11 +334,19 @@ async function handleRegister(event) {
         nome: nome.trim(),
         cpf: authService.formatCPF(cpf),
         endereco: endereco.trim(),
+        rg: rg.trim(),
+        profissao: profissao.trim(),
         email: email.trim(),
         password: password
     };
     
-    const success = await authService.register(clienteData);
+    // Adicionar rendimento se foi fornecido
+    if (empresa.trim() && salario && parseFloat(salario) > 0) {
+        clienteData.empresa = empresa.trim();
+        clienteData.salario = parseFloat(salario);
+    }
+    
+    const success = await authService.registerComRendimento(clienteData);
     if (success) {
         showPage('login');
         // Limpar formulário

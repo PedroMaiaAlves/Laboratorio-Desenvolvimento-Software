@@ -1,6 +1,10 @@
 package com.example.Aluguel.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -15,5 +19,7 @@ public class AgenteDTO {
     private String telefone;
     private String tipoAgente;
     private Boolean ativo;
+    private String email;
+    private String password;
 }
 

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.Aluguel.dto.ClienteDTO;
+import com.example.Aluguel.dto.RendimentoDTO;
 import com.example.Aluguel.service.ClienteService;
 
 import jakarta.validation.Valid;
@@ -35,6 +36,57 @@ public class ClienteController {
         ClienteDTO createdCliente = clienteService.createCliente(clienteDTO);
         var location = uriBuilder.path("/cliente/{id}").buildAndExpand(createdCliente.getId()).toUri();
         return ResponseEntity.created(location).body(createdCliente);
+    }
+
+    @PostMapping("/cadastrar-com-rendimento")
+    public ResponseEntity<Object> createClienteComRendimento(@RequestBody java.util.Map<String, Object> request,
+                                                           UriComponentsBuilder uriBuilder) {
+        try {
+            // Extrair dados do cliente
+            ClienteDTO clienteDTO = ClienteDTO.builder()
+                    .nome((String) request.get("nome"))
+                    .cpf((String) request.get("cpf"))
+                    .endereco((String) request.get("endereco"))
+                    .rg((String) request.get("rg"))
+                    .profissao((String) request.get("profissao"))
+                    .email((String) request.get("email"))
+                    .password((String) request.get("password"))
+                    .build();
+
+            // Extrair dados do rendimento (se fornecidos)
+            RendimentoDTO rendimentoDTO = null;
+            if (request.containsKey("empresa") && request.containsKey("salario")) {
+                String empresa = (String) request.get("empresa");
+                Object salarioObj = request.get("salario");
+                
+                if (empresa != null && !empresa.trim().isEmpty() && salarioObj != null) {
+                    Double salario = null;
+                    if (salarioObj instanceof Number) {
+                        salario = ((Number) salarioObj).doubleValue();
+                    } else if (salarioObj instanceof String) {
+                        try {
+                            salario = Double.parseDouble((String) salarioObj);
+                        } catch (NumberFormatException e) {
+                            // Ignorar se não for um número válido
+                        }
+                    }
+                    
+                    if (salario != null && salario > 0) {
+                        rendimentoDTO = RendimentoDTO.builder()
+                                .entidadeEmpregadora(empresa)
+                                .valor(salario)
+                                .build();
+                    }
+                }
+            }
+
+            ClienteDTO createdCliente = clienteService.createClienteComRendimento(clienteDTO, rendimentoDTO);
+            var location = uriBuilder.path("/cliente/{id}").buildAndExpand(createdCliente.getId()).toUri();
+            return ResponseEntity.created(location).body(createdCliente);
+            
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("erro", e.getMessage()));
+        }
     }
 
     // Poderíamos também expor endpoint para alterar senha do cliente, mas manteremos na Auth.

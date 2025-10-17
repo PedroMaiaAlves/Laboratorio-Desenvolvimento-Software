@@ -197,13 +197,16 @@ class GestorService {
     }
 
     async cadastrarAgente(data) {
+        // Não precisa mais do mapeamento, usa o valor direto do select
         const agenteData = {
             nome: data.nome,
             cnpj: data.cnpj || '',
             endereco: data.endereco || '',
             telefone: data.telefone || '',
-            tipoAgente: data.agenteTipo,
-            ativo: data.ativo
+            tipoAgente: data.agenteTipo, // Usar diretamente o valor do select
+            ativo: data.ativo,
+            email: data.email,
+            password: data.senha
         };
 
         return await apiService.cadastrarAgente(agenteData);
@@ -285,6 +288,10 @@ class GestorService {
         const tipoIcon = gestorTipo === 'ADMIN' ? 'fas fa-user-shield' : 'fas fa-building';
         const tipoText = gestorTipo === 'ADMIN' ? 'Administrador' : 'Agente';
         
+                            // <button class="btn btn-outline-primary btn-sm" onclick="gestorService.editarGestor(${gestor.id}, '${gestorTipo}')">
+                               // <i class="fas fa-edit"></i> Editar
+                            // </button>
+
         return `
             <div class="col-md-6 col-lg-4 mb-3">
                 <div class="card">
@@ -307,9 +314,7 @@ class GestorService {
                             </small>
                         </p>
                         <div class="btn-group w-100" role="group">
-                            <button class="btn btn-outline-primary btn-sm" onclick="gestorService.editarGestor(${gestor.id}, '${gestorTipo}')">
-                                <i class="fas fa-edit"></i> Editar
-                            </button>
+                            
                             <button class="btn btn-outline-danger btn-sm" onclick="gestorService.deletarGestor(${gestor.id}, '${gestorTipo}')">
                                 <i class="fas fa-trash"></i> Excluir
                             </button>

@@ -120,6 +120,29 @@ class ApiService {
         return response;
     }
 
+    async loginAgente(email, password) {
+        const response = await this.request('/agentes/login', {
+            method: 'POST',
+            body: JSON.stringify({ email, password }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        // Para agentes, não temos token JWT, então vamos simular
+        this.token = 'agente_' + response.id;
+        localStorage.setItem('token', this.token);
+        localStorage.setItem('user', JSON.stringify({
+            email: response.email,
+            role: 'AGENTE',
+            id: response.id,
+            nome: response.nome,
+            tipoAgente: response.tipoAgente
+        }));
+        
+        return response;
+    }
+
     async alterarSenha(email, password) {
         return await this.request('/auth/alterar-senha', {
             method: 'PUT',
@@ -139,6 +162,16 @@ class ApiService {
     // Métodos de cliente
     async cadastrarCliente(clienteData) {
         return await this.request('/cliente/cadastrar', {
+            method: 'POST',
+            body: JSON.stringify(clienteData),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    }
+
+    async cadastrarClienteComRendimento(clienteData) {
+        return await this.request('/cliente/cadastrar-com-rendimento', {
             method: 'POST',
             body: JSON.stringify(clienteData),
             headers: {
@@ -225,6 +258,78 @@ class ApiService {
         return await this.request(`/pedidos/status/${status}`);
     }
 
+    async listarPedidosGerenciaveisPorAgente(agenteId) {
+        return await this.request(`/pedidos/agente/${agenteId}/gerenciaveis`);
+    }
+
+    async listarPedidosPorAgente(agenteId) {
+        return await this.request(`/pedidos/agente/${agenteId}`);
+    }
+
+    async listarTodosPedidos() {
+        return await this.request(`/pedidos/todos`);
+    }
+
+    async atualizarDetalhesPedido(id, pedidoData) {
+        return await this.request(`/pedidos/${id}/atualizar-detalhes`, {
+            method: 'PUT',
+            body: JSON.stringify(pedidoData)
+        });
+    }
+
+    async modificarPedidoCompleto(id, pedidoData, gestorId) {
+        const params = gestorId ? `?gestorId=${gestorId}` : '';
+        return await this.request(`/pedidos/${id}/modificar-completo${params}`, {
+            method: 'PUT',
+            body: JSON.stringify(pedidoData)
+        });
+    }
+
+    // Métodos de rendimentos
+    async criarRendimento(rendimentoData) {
+        return await this.request('/rendimentos/criar', {
+            method: 'POST',
+            body: JSON.stringify(rendimentoData)
+        });
+    }
+
+    async listarRendimentosPorCliente(clienteId) {
+        return await this.request(`/rendimentos/cliente/${clienteId}`);
+    }
+
+    async atualizarRendimento(id, rendimentoData) {
+        return await this.request(`/rendimentos/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(rendimentoData)
+        });
+    }
+
+    async deletarRendimento(id) {
+        return await this.request(`/rendimentos/${id}`, {
+            method: 'DELETE'
+        });
+    }
+
+    async debugRendimentos() {
+        return await this.request('/rendimentos/debug');
+    }
+
+    async buscarContratoPorPedido(pedidoId) {
+        return await this.request(`/pedidos/${pedidoId}/contrato`);
+    }
+
+    async obterClientePorId(clienteId) {
+        return await this.request(`/cliente/${clienteId}`);
+    }
+
+    async obterAutomovelPorId(automovelId) {
+        return await this.request(`/automoveis/${automovelId}`);
+    }
+
+    async obterAgentePorId(agenteId) {
+        return await this.request(`/agentes/${agenteId}`);
+    }
+
     // Métodos de automóveis
     async criarAutomovel(automovelData) {
         return await this.request('/automoveis/cadastrar', {
@@ -270,7 +375,10 @@ class ApiService {
     }
 
     async listarAgentesAtivos() {
-        return await this.request('/agentes/ativos');
+        console.log('Fazendo requisição para /agentes/ativos');
+        const result = await this.request('/agentes/ativos');
+        console.log('Resposta do endpoint /agentes/ativos:', result);
+        return result;
     }
 
     async listarAgentesPorTipo(tipo) {
@@ -368,6 +476,7 @@ class ApiService {
 
             // Baseado no tipo de usuário, buscar nos endpoints específicos
             if (user.role === 'CLIENTE') {
+                // Buscar na tabela clientes (que é referenciada pelos pedidos)
                 const clientes = await this.listarClientes();
                 const cliente = clientes.find(c => c.email === email);
                 return cliente;

@@ -62,14 +62,8 @@ class AdminPage {
 
     async carregarTodosPedidos() {
         try {
-            const statusList = ['PENDENTE', 'APROVADO', 'REJEITADO', 'CONTRATADO', 'CANCELADO'];
-            this.pedidos = [];
-            
-            for (const status of statusList) {
-                const pedidosStatus = await apiService.listarPedidosPorStatus(status);
-                this.pedidos = this.pedidos.concat(pedidosStatus);
-            }
-            
+            // Usar o novo endpoint que retorna todos os pedidos de uma vez
+            this.pedidos = await apiService.listarTodosPedidos();
             this.renderPedidos();
         } catch (error) {
             console.error('Erro ao carregar pedidos:', error);
@@ -81,6 +75,21 @@ class AdminPage {
         document.getElementById('total-veiculos').textContent = this.automoveis.length;
         document.getElementById('total-agentes').textContent = this.agentes.length;
         document.getElementById('total-pedidos').textContent = this.pedidos.length;
+    }
+
+    setButtonLoading(button, loading) {
+        if (loading) {
+            button.disabled = true;
+            button.innerHTML = `
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Cadastrando...
+            `;
+        } else {
+            button.disabled = false;
+            button.innerHTML = `
+                <i class="fas fa-save"></i> Cadastrar Veículo
+            `;
+        }
     }
 
     renderClientes() {
@@ -404,6 +413,12 @@ class AdminPage {
 
     // Métodos de CRUD para Automóveis
     async criarVeiculo() {
+        // Prevenir duplo envio
+        const submitButton = document.querySelector('#novo-veiculo-form button[type="submit"]');
+        if (submitButton && submitButton.disabled) {
+            return; // Já está processando
+        }
+
         const placa = document.getElementById('veiculo-placa').value;
         const matricula = document.getElementById('veiculo-matricula').value;
         const ano = document.getElementById('veiculo-ano').value;
@@ -437,6 +452,11 @@ class AdminPage {
             return;
         }
 
+        // Desabilitar botão e mostrar loading
+        if (submitButton) {
+            this.setButtonLoading(submitButton, true);
+        }
+
         try {
             const automovelData = {
                 placa: placa.trim(),
@@ -459,7 +479,17 @@ class AdminPage {
             this.renderAutomoveis();
             this.atualizarEstatisticas();
         } catch (error) {
-            authService.showMessage('Erro ao criar veículo: ' + error.message, 'danger');
+            // Verificar se é erro de placa duplicada
+            if (error.message.includes('Duplicate entry') && error.message.includes('placa')) {
+                authService.showMessage('Esta placa já está cadastrada no sistema. Por favor, use uma placa diferente.', 'warning');
+            } else {
+                authService.showMessage('Erro ao criar veículo: ' + error.message, 'danger');
+            }
+        } finally {
+            // Reabilitar botão
+            if (submitButton) {
+                this.setButtonLoading(submitButton, false);
+            }
         }
     }
 
@@ -486,6 +516,9 @@ class AdminPage {
     // Métodos de CRUD para Agentes
     async criarAgente() {
         const nome = document.getElementById('agente-nome').value;
+        const cnpj = document.getElementById('agente-cnpj').value;
+        const endereco = document.getElementById('agente-endereco').value;
+        const telefone = document.getElementById('agente-telefone').value;
         const email = document.getElementById('agente-email').value;
         const senha = document.getElementById('agente-senha').value;
         const tipo = document.getElementById('agente-tipo').value;
@@ -493,6 +526,21 @@ class AdminPage {
         // Validações
         if (!nome.trim()) {
             authService.showMessage('Por favor, insira o nome do agente.', 'warning');
+            return;
+        }
+
+        if (!cnpj.trim()) {
+            authService.showMessage('Por favor, insira o CNPJ.', 'warning');
+            return;
+        }
+
+        if (!endereco.trim()) {
+            authService.showMessage('Por favor, insira o endereço.', 'warning');
+            return;
+        }
+
+        if (!telefone.trim()) {
+            authService.showMessage('Por favor, insira o telefone.', 'warning');
             return;
         }
 
@@ -507,21 +555,24 @@ class AdminPage {
         }
 
         if (!tipo) {
-            authService.showMessage('Por favor, selecione o tipo do agente.', 'warning');
+            authService.showMessage('Por favor, selecione o tipo do gestor.', 'warning');
             return;
         }
 
         try {
             const agenteData = {
                 nome: nome.trim(),
+                cnpj: cnpj.trim(),
+                endereco: endereco.trim(),
+                telefone: telefone.trim(),
                 email: email.trim(),
                 password: senha,
-                tipo: tipo,
+                tipoAgente: tipo,
                 ativo: true
             };
 
             await apiService.cadastrarAgente(agenteData);
-            authService.showMessage('Agente criado com sucesso!', 'success');
+            authService.showMessage(`Gestor ${tipo} criado com sucesso!`, 'success');
             
             // Fechar modal e recarregar dados
             const modal = bootstrap.Modal.getInstance(document.getElementById('novoAgenteModal'));
@@ -532,7 +583,7 @@ class AdminPage {
             this.renderAgentes();
             this.atualizarEstatisticas();
         } catch (error) {
-            authService.showMessage('Erro ao criar agente: ' + error.message, 'danger');
+            authService.showMessage('Erro ao criar gestor: ' + error.message, 'danger');
         }
     }
 

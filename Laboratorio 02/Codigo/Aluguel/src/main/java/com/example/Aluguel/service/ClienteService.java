@@ -1,22 +1,30 @@
 package com.example.Aluguel.service;
 
-import com.example.Aluguel.dto.ClienteDTO;
-import com.example.Aluguel.entities.Cliente;
-import com.example.Aluguel.entities.Usuario;
-import com.example.Aluguel.repository.ClienteRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.example.Aluguel.dto.ClienteDTO;
+import com.example.Aluguel.dto.RendimentoDTO;
+import com.example.Aluguel.entities.Cliente;
+import com.example.Aluguel.entities.Rendimento;
+import com.example.Aluguel.entities.Usuario;
+import com.example.Aluguel.repository.ClienteRepository;
+import com.example.Aluguel.repository.RendimentoRepository;
+
+import lombok.RequiredArgsConstructor;
+
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ClienteService {
 
     private final ClienteRepository clienteRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RendimentoRepository rendimentoRepository;
 
     public ClienteDTO createCliente(ClienteDTO clienteDTO) {
         if (clienteRepository.existsByCpf(clienteDTO.getCpf())) {
@@ -29,6 +37,8 @@ public class ClienteService {
                 .cpf(clienteDTO.getCpf())
                 .nome(clienteDTO.getNome())
                 .endereco(clienteDTO.getEndereco())
+                .rg(clienteDTO.getRg())
+                .profissao(clienteDTO.getProfissao())
                 .email(clienteDTO.getEmail())
                 .password(passwordEncoder.encode(clienteDTO.getPassword()))
                 .role(Usuario.Role.CLIENTE)
@@ -37,6 +47,32 @@ public class ClienteService {
 
         Cliente savedCliente = clienteRepository.save(cliente);
         return convertToDTO(savedCliente);
+    }
+
+    public ClienteDTO createClienteComRendimento(ClienteDTO clienteDTO, RendimentoDTO rendimentoDTO) {
+        // Criar cliente primeiro
+        ClienteDTO clienteCriado = createCliente(clienteDTO);
+        
+        // Se foi fornecido um rendimento, criar também
+        if (rendimentoDTO != null && 
+            rendimentoDTO.getEntidadeEmpregadora() != null && 
+            !rendimentoDTO.getEntidadeEmpregadora().trim().isEmpty() &&
+            rendimentoDTO.getValor() != null && 
+            rendimentoDTO.getValor() > 0) {
+            
+            Cliente cliente = clienteRepository.findById(clienteCriado.getId())
+                    .orElseThrow(() -> new RuntimeException("Cliente criado não encontrado"));
+            
+            Rendimento rendimento = Rendimento.builder()
+                    .entidadeEmpregadora(rendimentoDTO.getEntidadeEmpregadora())
+                    .valor(rendimentoDTO.getValor())
+                    .cliente(cliente)
+                    .build();
+            
+            rendimentoRepository.save(rendimento);
+        }
+        
+        return clienteCriado;
     }
 
     public List<ClienteDTO> getAllClientes() {
@@ -59,6 +95,9 @@ public class ClienteService {
         cliente.setNome(clienteDTO.getNome());
         cliente.setEndereco(clienteDTO.getEndereco());
         cliente.setEmail(clienteDTO.getEmail());
+        cliente.setRg(clienteDTO.getRg());
+        cliente.setProfissao(clienteDTO.getProfissao());
+        
         if (clienteDTO.getPassword() != null && !clienteDTO.getPassword().isBlank()) {
             cliente.setPassword(passwordEncoder.encode(clienteDTO.getPassword()));
         }
@@ -78,6 +117,8 @@ public class ClienteService {
                 .nome(cliente.getNome())
                 .endereco(cliente.getEndereco())
                 .email(cliente.getEmail())
+                .rg(cliente.getRg())
+                .profissao(cliente.getProfissao())
                 .build();
     }
 }

@@ -4,6 +4,7 @@ import com.example.Aluguel.dto.AgenteDTO;
 import com.example.Aluguel.entities.Agente;
 import com.example.Aluguel.repository.AgenteRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,10 +15,15 @@ import java.util.stream.Collectors;
 public class AgenteService {
 
     private final AgenteRepository agenteRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public AgenteDTO criarAgente(AgenteDTO agenteDTO) {
         if (agenteRepository.existsByCnpj(agenteDTO.getCnpj())) {
             throw new RuntimeException("CNPJ já cadastrado");
+        }
+        
+        if (agenteRepository.existsByEmail(agenteDTO.getEmail())) {
+            throw new RuntimeException("Email já cadastrado");
         }
 
         Agente agente = Agente.builder()
@@ -26,6 +32,8 @@ public class AgenteService {
                 .endereco(agenteDTO.getEndereco())
                 .telefone(agenteDTO.getTelefone())
                 .tipoAgente(Agente.TipoAgente.valueOf(agenteDTO.getTipoAgente()))
+                .email(agenteDTO.getEmail())
+                .password(passwordEncoder.encode(agenteDTO.getPassword()))
                 .ativo(true)
                 .build();
 
@@ -58,6 +66,21 @@ public class AgenteService {
         return convertToDTO(agente);
     }
 
+    public AgenteDTO autenticarAgente(String email, String password) {
+        Agente agente = agenteRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Agente não encontrado"));
+        
+        if (!agente.getAtivo()) {
+            throw new RuntimeException("Agente inativo");
+        }
+        
+        if (!passwordEncoder.matches(password, agente.getPassword())) {
+            throw new RuntimeException("Senha incorreta");
+        }
+        
+        return convertToDTO(agente);
+    }
+
     private AgenteDTO convertToDTO(Agente agente) {
         return AgenteDTO.builder()
                 .id(agente.getId())
@@ -67,6 +90,7 @@ public class AgenteService {
                 .telefone(agente.getTelefone())
                 .tipoAgente(agente.getTipoAgente().name())
                 .ativo(agente.getAtivo())
-                .build();
+                .email(agente.getEmail())
+                .build(); // Não incluir password por segurança
     }
 }

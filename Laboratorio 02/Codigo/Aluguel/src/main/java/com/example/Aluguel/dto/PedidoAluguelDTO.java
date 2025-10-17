@@ -1,7 +1,12 @@
 package com.example.Aluguel.dto;
 
-import lombok.*;
 import java.time.LocalDateTime;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -12,6 +17,9 @@ public class PedidoAluguelDTO {
     private Long id;
     private Long clienteId;
     private Long automovelId;
+    private Long agenteId;
+    private String nomeAgente;
+    private String tipoAgente;
     private String status;
     private LocalDateTime dataCriacao;
     private LocalDateTime dataModificacao;
