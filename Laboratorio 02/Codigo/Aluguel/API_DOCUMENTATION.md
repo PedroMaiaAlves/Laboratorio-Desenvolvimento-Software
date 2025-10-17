@@ -107,3 +107,4 @@ Sistema de aluguel de automóveis implementado com Spring Boot, seguindo o diagr
 3. Implementar testes unitários
 4. Adicionar tratamento de exceções global
 5. Implementar logs de auditoria
+

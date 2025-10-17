@@ -14,3 +14,4 @@ public interface ContratoAluguelRepository extends JpaRepository<ContratoAluguel
     List<ContratoAluguel> findByStatus(ContratoAluguel.StatusContrato status);
     Optional<ContratoAluguel> findByNumeroContrato(String numeroContrato);
 }
+

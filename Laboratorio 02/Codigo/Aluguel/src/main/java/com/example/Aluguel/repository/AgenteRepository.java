@@ -14,3 +14,4 @@ public interface AgenteRepository extends JpaRepository<Agente, Long> {
     List<Agente> findByTipoAgente(Agente.TipoAgente tipoAgente);
     List<Agente> findByAtivoTrue();
 }
+

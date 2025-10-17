@@ -67,3 +67,4 @@ public class ContratoAluguel {
         dataModificacao = LocalDateTime.now();
     }
 }
+

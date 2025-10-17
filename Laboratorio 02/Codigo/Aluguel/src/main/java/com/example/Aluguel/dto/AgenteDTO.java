@@ -16,3 +16,4 @@ public class AgenteDTO {
     private String tipoAgente;
     private Boolean ativo;
 }
+
