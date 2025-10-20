@@ -7,14 +7,12 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 @Entity(name = "empresa")
-@SuperBuilder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Empresa extends Usuario{
+public class Empresa {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +24,10 @@ public class Empresa extends Usuario{
 
     private String telefone;
 
-    @Override
+    private String nome;
+    private String email;
+    private String senha;
+
     public String getRole() {
         return "EMPRESA";
     }

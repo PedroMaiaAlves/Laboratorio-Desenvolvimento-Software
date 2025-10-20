@@ -4,14 +4,12 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 @Entity(name = "professor")
-@SuperBuilder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Professor extends Usuario {
+public class Professor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,11 +21,14 @@ public class Professor extends Usuario {
 
     private double saldoMoedas;
 
+    private String nome;
+    private String email;
+    private String senha;
+
     @ManyToOne
     @JoinColumn(name = "instituicao_id")
     private Instituicao instituicao;
 
-    @Override
     public String getRole() {
         return "PROFESSOR";
     }

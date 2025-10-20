@@ -2,20 +2,25 @@ package com.moedas.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Entity(name = "aluno")
-@SuperBuilder
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class Aluno extends Usuario {
+public class Aluno{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    private String nome;
+    private String email;
+    private String senha;
 
     private String cpf;
 
@@ -31,7 +36,6 @@ public class Aluno extends Usuario {
 
     private double saldoMoedas;
 
-    @Override
     public String getRole() {
         return "ALUNO";
     }
