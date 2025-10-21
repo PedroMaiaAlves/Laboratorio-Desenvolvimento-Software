@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Empresas</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+	<style>
+		a { text-decoration: none !important; }
+	</style>
+</head>
+
+<body class="bg-secondary">
+	<nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="index.html">Sistema Moeda Estudantil</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+				aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav ms-auto">
+					<li class="nav-item">
+						<a class="nav-link text-light" href="index.html">Lista de Alunos</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link text-light active" href="empresas.html">Lista de Empresas</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link text-light" href="cadastrarEmpresa.html">Cadastrar Empresa</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<div class="container-md py-5">
+		<div class="d-flex justify-content-between align-items-center mb-4">
+			<h3 class="mb-0 text-light">Lista de Empresas</h3>
+			<a href="cadastrarEmpresa.html" class="btn btn-success">
+				<i class="bi bi-building me-2"></i> Cadastrar Empresa
+			</a>
+		</div>
+
+		<div class="card p-3 shadow-sm bg-white">
+			<div class="table-responsive">
+				<table class="table table-striped align-middle mb-0">
+					<thead class="table-secondary">
+						<tr>
+							<th>Id</th>
+							<th>Nome</th>
+							<th>Email</th>
+							<th>Endereço</th>
+							<th>CNPJ</th>
+							<th>IE</th>
+							<th class="text-center">Ações</th>
+						</tr>
+					</thead>
+					<tbody id="empresas-tbody">
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="Controller/empresas.js"></script>
+</body>
+
+</html>

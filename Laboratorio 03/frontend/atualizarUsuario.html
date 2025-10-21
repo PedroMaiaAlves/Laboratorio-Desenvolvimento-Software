@@ -11,44 +11,54 @@
 <body class="bg-secondary">
 
     <div class="container-md py-5">
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb bg-transparent p-0 mb-0">
+                <li class="breadcrumb-item"><a href="index.html" class="text-light">Início</a></li>
+                <li class="breadcrumb-item active text-light" aria-current="page">Atualizar Aluno</li>
+            </ol>
+        </nav>
+
         <h2 class="fw-bold mb-4 text-light">Atualizar Dados do Aluno</h2>
 
         <form id="formAtualizacaoAluno" class="card p-4 shadow-sm bg-white">
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label class="form-label">Nome</label>
-                    <input id="nome" type="text" class="form-control" placeholder="Digite o nome completo" required>
+            <div class="row g-3 mb-3">
+                <div class="col-12">
+                    <label for="nome" class="form-label small fw-semibold">Nome completo</label>
+                    <div class="input-group">
+                        <span class="input-group-text" id="icon-nome">👤</span>
+                        <input id="nome" type="text" class="form-control" placeholder="Digite o nome completo" aria-describedby="icon-nome" required>
+                    </div>
+                    <div class="form-text">Preencha o nome completo do aluno.</div>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Email</label>
-                    <input id="email" type="email" class="form-control" placeholder="exemplo@email.com" required>
-                </div>
-            </div>
 
-            <div class="row mb-3">
                 <div class="col-md-6">
-                    <label class="form-label">Senha</label>
-                    <input id="senha" type="password" class="form-control" placeholder="Digite uma senha">
+                    <label for="rg" class="form-label small fw-semibold">RG</label>
+                    <div class="input-group">
+                        <span class="input-group-text">🪪</span>
+                        <input id="rg" type="text" class="form-control" placeholder="00.000.000-0">
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Endereço</label>
-                    <input id="endereco" type="text" class="form-control" placeholder="Rua, número, bairro">
-                </div>
-            </div>
 
-            <div class="row mb-3">
                 <div class="col-md-6">
-                    <label class="form-label">RG</label>
-                    <input id="rg" type="text" class="form-control" placeholder="00.000.000-0">
+                    <label for="cpf" class="form-label small fw-semibold">CPF</label>
+                    <div class="input-group">
+                        <span class="input-group-text">📄</span>
+                        <input id="cpf" type="text" class="form-control" placeholder="000.000.000-00" required>
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">CPF</label>
-                    <input id="cpf" type="text" class="form-control" placeholder="000.000.000-00" required>
+
+                <div class="col-12">
+                    <label for="endereco" class="form-label small fw-semibold">Endereço</label>
+                    <div class="input-group">
+                        <span class="input-group-text">📍</span>
+                        <input id="endereco" type="text" class="form-control" placeholder="Rua, número, bairro">
+                    </div>
+                    <div class="form-text">Opcional — informe o endereço completo para contatos.</div>
                 </div>
             </div>
 
             <div class="d-flex justify-content-end">
-                <a href="index.html" class="btn btn-secondary me-2">Cancelar</a>
+                <a href="index.html" class="btn btn-outline-secondary me-2">Cancelar</a>
                 <button type="submit" class="btn btn-primary">Atualizar</button>
             </div>
         </form>

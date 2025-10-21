@@ -1,6 +1,45 @@
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('formCadastroAluno');
 
+  const inputCPF = document.getElementById('cpf');
+  const inputRG = document.getElementById('rg');
+
+  // Função simples para aplicar máscara de CPF: 000.000.000-00
+  function mascaraCPF(value) {
+    return value
+      .replace(/\D/g, '')
+      .slice(0, 11)
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  }
+
+  // Função simples para aplicar máscara de RG: 00.000.000-0 (até 9 dígitos sem pontos)
+  function mascaraRG(value) {
+    return value
+      .replace(/\D/g, '')
+      .slice(0, 9)
+      .replace(/(\d{2})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1})$/, '$1-$2');
+  }
+
+  if (inputCPF) {
+    inputCPF.addEventListener('input', (e) => {
+      const pos = e.target.selectionStart;
+      e.target.value = mascaraCPF(e.target.value);
+      e.target.setSelectionRange(pos, pos);
+    });
+  }
+
+  if (inputRG) {
+    inputRG.addEventListener('input', (e) => {
+      const pos = e.target.selectionStart;
+      e.target.value = mascaraRG(e.target.value);
+      e.target.setSelectionRange(pos, pos);
+    });
+  }
+
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
 
