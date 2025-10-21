@@ -15,8 +15,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AlunoController {
 
-    private final AlunoService alunoService
-            ;
+    private final AlunoService alunoService;
 
 
     @Post("/cadastrar")
@@ -49,6 +48,16 @@ public class AlunoController {
     public HttpResponse<?> visualizarPerfil(@PathVariable int id) {
         try{
             return HttpResponse.ok(alunoService.viewPerfil(id));
+        } catch (Exception e) {
+            return HttpResponse.badRequest(e.getMessage());
+        }
+    }
+
+    @Get("/all")
+    @Secured(SecurityRule.IS_ANONYMOUS)
+    public HttpResponse<?> listarAlunos() {
+        try{
+            return HttpResponse.ok(alunoService.lista());
         } catch (Exception e) {
             return HttpResponse.badRequest(e.getMessage());
         }

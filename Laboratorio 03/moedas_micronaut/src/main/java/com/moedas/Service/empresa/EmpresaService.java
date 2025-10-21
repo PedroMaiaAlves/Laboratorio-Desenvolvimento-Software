@@ -2,6 +2,7 @@ package com.moedas.Service.empresa;
 
 import com.moedas.dto.request.CreateEmpresaRequestDTO;
 import com.moedas.dto.request.UpdateEmpresaRequestDTO;
+import com.moedas.dto.response.CreateAlunoResponseDTO;
 import com.moedas.dto.response.CreateEmpresaResponseDTO;
 import com.moedas.entities.Aluno;
 import com.moedas.entities.Empresa;
@@ -11,6 +12,8 @@ import io.micronaut.http.HttpStatus;
 import io.micronaut.http.exceptions.HttpStatusException;
 import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @Singleton
 @RequiredArgsConstructor
@@ -45,6 +48,19 @@ public class EmpresaService {
         Empresa empresa = empresaRepository.findById(id).get();
 
         return createEmpresaDTO(empresa);
+    }
+
+    public List<CreateEmpresaResponseDTO> lista(){
+        List<Empresa> empresas = empresaRepository.findAll();
+
+        return empresas.stream()
+                .map(empresa -> CreateEmpresaResponseDTO.builder()
+                        .id(empresa.getId())
+                        .telefone(empresa.getTelefone())
+                        .cnpj(empresa.getCnpj())
+                        .senha(empresa.getSenha())
+                        .email(empresa.getEmail())
+                        .razaoSocial(empresa.getRazaoSocial()).build()).toList();
     }
 
     public void deleteEmpresa(Long id) {

@@ -9,6 +9,9 @@ import io.micronaut.http.HttpStatus;
 import io.micronaut.http.exceptions.HttpStatusException;
 import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import org.w3c.dom.stylesheets.LinkStyle;
+
+import java.util.*;
 
 @Singleton
 @RequiredArgsConstructor
@@ -58,6 +61,20 @@ public class AlunoService {
 
         System.out.println(aluno.getEmail());
         return createDTO(aluno);
+    }
+
+    public List<CreateAlunoResponseDTO> lista(){
+        List<Aluno> alunos = alunoRepository.findAll();
+
+        return alunos.stream()
+                .map(aluno -> CreateAlunoResponseDTO.builder()
+                        .id(aluno.getId())
+                        .cpf(aluno.getCpf())
+                        .email(aluno.getEmail())
+                        .rg(aluno.getRg())
+                        .senha(aluno.getSenha())
+                        .endereco(aluno.getEndereco())
+                        .nome(aluno.getNome()).build()).toList();
     }
 
     public void delete(int id) {

@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Serdeable
-@Introspected
 public class CreateAlunoRequestDTO {
     private String cpf;
     private String rg;

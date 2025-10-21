@@ -35,6 +35,16 @@ public class EmpresaController {
         }
     }
 
+    @Get("/all")
+    @Secured(SecurityRule.IS_ANONYMOUS)
+    public HttpResponse<?> listarAlunos() {
+        try{
+            return HttpResponse.ok(empresaService.lista());
+        } catch (Exception e) {
+            return HttpResponse.badRequest(e.getMessage());
+        }
+    }
+
     @Get("/view/{id}")
     @Secured(SecurityRule.IS_ANONYMOUS)
     public HttpResponse<?> viewEmpresa(@PathVariable Long id) {
