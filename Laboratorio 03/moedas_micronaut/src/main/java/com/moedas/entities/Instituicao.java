@@ -1,19 +1,17 @@
 package com.moedas.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.List;
 
 @Entity(name = "instituicao")
-@Builder
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Instituicao {
 
     @Id
@@ -22,6 +20,15 @@ public class Instituicao {
 
     private String nome;
 
-    private String telefone;
+    private String cnpj;
+
     private String endereco;
+
+    private String telefone;
+
+    @OneToMany(mappedBy = "instituicao")
+    private List<Aluno> alunos;
+
+    @OneToMany(mappedBy = "instituicao")
+    private List<Professor> professores;
 }

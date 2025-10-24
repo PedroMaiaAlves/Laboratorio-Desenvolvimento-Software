@@ -102,6 +102,34 @@
             <artifactId>junit-jupiter-engine</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- Micronaut Email -->
+        <dependency>
+            <groupId>io.micronaut.email</groupId>
+            <artifactId>micronaut-email</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Escolha um provider de email (exemplo com SendGrid) -->
+        <dependency>
+            <groupId>io.micronaut.email</groupId>
+            <artifactId>micronaut-email-sendgrid</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Ou para usar JavaMail -->
+        <dependency>
+            <groupId>io.micronaut.email</groupId>
+            <artifactId>micronaut-email-javamail</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Ou para usar Amazon SES -->
+        <dependency>
+            <groupId>io.micronaut.email</groupId>
+            <artifactId>micronaut-email-amazon-ses</artifactId>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>

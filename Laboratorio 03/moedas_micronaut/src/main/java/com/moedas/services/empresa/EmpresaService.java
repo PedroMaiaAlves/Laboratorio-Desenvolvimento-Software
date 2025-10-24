@@ -1,13 +1,10 @@
-package com.moedas.Service.empresa;
+package com.moedas.services.empresa;
 
 import com.moedas.dto.request.CreateEmpresaRequestDTO;
 import com.moedas.dto.request.UpdateEmpresaRequestDTO;
-import com.moedas.dto.response.CreateAlunoResponseDTO;
 import com.moedas.dto.response.CreateEmpresaResponseDTO;
-import com.moedas.entities.Aluno;
 import com.moedas.entities.Empresa;
 import com.moedas.repositories.EmpresaRepository;
-import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.exceptions.HttpStatusException;
 import jakarta.inject.Singleton;

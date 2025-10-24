@@ -1,22 +1,41 @@
 package com.moedas.controllers;
 
-import com.moedas.Service.aluno.AlunoService;
 import com.moedas.dto.request.CreateAlunoRequestDTO;
+import com.moedas.dto.request.ResgateRequest;
 import com.moedas.dto.request.UpdateAlunoRequestDTO;
 import com.moedas.dto.response.CreateAlunoResponseDTO;
 import com.moedas.entities.Aluno;
+import com.moedas.entities.Resgate;
+import com.moedas.entities.Transacao;
+import com.moedas.entities.Vantagem;
+import com.moedas.repositories.AlunoRepository;
+import com.moedas.repositories.ResgateRepository;
+import com.moedas.repositories.TransacaoRepository;
+import com.moedas.repositories.VantagemRepository;
+import com.moedas.services.MoedaService;
+import com.moedas.services.ResgateService;
+import com.moedas.services.aluno.AlunoService;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import lombok.RequiredArgsConstructor;
 
-@Controller("/aluno")
+import java.util.List;
+import java.util.Map;
+
+@Controller("/alunos")
+@Secured(SecurityRule.IS_AUTHENTICATED)
 @RequiredArgsConstructor
 public class AlunoController {
 
+    private final AlunoRepository alunoRepository;
+    private final VantagemRepository vantagemRepository;
+    private final TransacaoRepository transacaoRepository;
+    private final ResgateRepository resgateRepository;
+    private final MoedaService moedaService;
+    private final ResgateService resgateService;
     private final AlunoService alunoService;
-
 
     @Post("/cadastrar")
     @Secured(SecurityRule.IS_ANONYMOUS)
@@ -72,5 +91,36 @@ public class AlunoController {
         }catch (Exception e) {
             return HttpResponse.serverError("Erro interno no servidor");
         }
+    }
+
+    @Get("/vantagens")
+    @Secured("ALUNO")
+    public List<Vantagem> getVantagens() {
+        return vantagemRepository.findByAtivaTrue();
+    }
+
+    @Post("/{id}/resgatar")
+    @Secured("ALUNO")
+    public Resgate resgatarVantagem(@PathVariable Long id, @Body ResgateRequest request) {
+        return resgateService.resgatarVantagem(id, request);
+    }
+
+    @Get("/{id}/extrato-transacoes")
+    @Secured("ALUNO")
+    public List<Transacao> getExtratoTransacoes(@PathVariable Long id) {
+        return transacaoRepository.findByAlunoIdOrderByDataHoraDesc(id);
+    }
+
+    @Get("/{id}/extrato-resgates")
+    @Secured("ALUNO")
+    public List<Resgate> getExtratoResgates(@PathVariable Long id) {
+        return resgateRepository.findByAlunoIdOrderByDataHoraDesc(id);
+    }
+
+    @Get("/{id}/saldo")
+    @Secured("ALUNO")
+    public Map<String, Double> getSaldo(@PathVariable Long id) {
+        double saldo = moedaService.consultarSaldoAluno(id);
+        return Map.of("saldo", saldo);
     }
 }
