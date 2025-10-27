@@ -217,6 +217,11 @@ classDiagram
 ![Diagrama de Entidade-Relacionamento](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio%2003/Diagrama_Entidade_Relacionamento.png)
 ---
 
+### Diagrama de Pacotes
+
+![Diagrama de Pacotes](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio%2003/Arquitetura.png)
+---
+
 ### 🧩 Explicação do modelo:
 - **Usuário** é uma classe abstrata, base para **Aluno**, **Professor** e **Empresa** (todos precisam de login e senha).  
 - **Professor** e **Aluno** têm relação com **Instituição**, pois pertencem a ela.  
