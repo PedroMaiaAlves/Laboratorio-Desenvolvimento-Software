@@ -2,6 +2,8 @@
 **Laboratório de Desenvolvimento de Software**
 ---
 
+<img src="Lab 03.gif" align="center" style="width:100%;" alt="Descrição do gif">
+
 ## 🧩 Descrição do Sistema  
 
 O **Sistema de Moeda Estudantil** tem como objetivo reconhecer o mérito dos alunos por meio de uma **moeda virtual**.  
