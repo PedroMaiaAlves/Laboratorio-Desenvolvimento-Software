@@ -10,7 +10,6 @@ import com.moedas.repositories.EmpresaRepository;
 import com.moedas.repositories.ProfessorRepository;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.errors.OauthErrorResponseException;
-import io.micronaut.security.token.jwt.render.AccessRefreshToken;
 import io.micronaut.security.token.jwt.generator.JwtTokenGenerator;
 import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;

@@ -36,7 +36,7 @@ public class AlunoService {
         return createDTO(aluno);
     }
 
-    public CreateAlunoResponseDTO update(UpdateAlunoRequestDTO dto, int id) {
+    public CreateAlunoResponseDTO update(UpdateAlunoRequestDTO dto, long id) {
         if (dto == null) {
             throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Dados de atualização não fornecidos");
         }
@@ -54,7 +54,7 @@ public class AlunoService {
         return createDTO(aluno);
     }
 
-    public CreateAlunoResponseDTO viewPerfil(int id){
+    public CreateAlunoResponseDTO viewPerfil(long id){
         Aluno aluno = alunoRepository.findById(id)
                 .orElseThrow(() -> new HttpStatusException(HttpStatus.NOT_FOUND, "Aluno com o id inexistente"));
 
@@ -76,7 +76,7 @@ public class AlunoService {
                         .nome(aluno.getNome()).build()).toList();
     }
 
-    public void delete(int id) {
+    public void delete(long id) {
         if (!alunoRepository.existsById(id)) {
             throw new HttpStatusException(HttpStatus.NOT_FOUND, "Aluno com o id inexistente");
         }

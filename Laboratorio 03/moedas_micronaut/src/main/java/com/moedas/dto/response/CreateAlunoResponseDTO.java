@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Serdeable
 public class CreateAlunoResponseDTO {
 
-    private int id;
+    private long id;
     private String cpf;
     private String rg;
     private String nome;
