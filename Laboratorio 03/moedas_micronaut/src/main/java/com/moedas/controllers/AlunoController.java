@@ -53,7 +53,7 @@ public class AlunoController {
 
     @Put("/update/{id}")
     @Secured(SecurityRule.IS_ANONYMOUS)
-    public HttpResponse<?> atualizarAluno(@Body UpdateAlunoRequestDTO updateAlunoRequestDTO, @PathVariable int id) {
+    public HttpResponse<?> atualizarAluno(@Body UpdateAlunoRequestDTO updateAlunoRequestDTO, @PathVariable long id) {
         try{
             System.out.println(id);
             return HttpResponse.ok(alunoService.update(updateAlunoRequestDTO, id));
@@ -64,7 +64,7 @@ public class AlunoController {
 
     @Get("/view/{id}")
     @Secured(SecurityRule.IS_ANONYMOUS)
-    public HttpResponse<?> visualizarPerfil(@PathVariable int id) {
+    public HttpResponse<?> visualizarPerfil(@PathVariable long id) {
         try{
             return HttpResponse.ok(alunoService.viewPerfil(id));
         } catch (Exception e) {
@@ -84,7 +84,7 @@ public class AlunoController {
 
     @Delete("/{id}")
     @Secured(SecurityRule.IS_ANONYMOUS)
-    public HttpResponse<?> deletarAluno(@PathVariable int id) {
+    public HttpResponse<?> deletarAluno(@PathVariable long id) {
         try {
             alunoService.delete(id);
             return HttpResponse.noContent();

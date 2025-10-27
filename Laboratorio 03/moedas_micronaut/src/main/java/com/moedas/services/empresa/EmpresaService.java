@@ -5,12 +5,14 @@ import com.moedas.dto.request.UpdateEmpresaRequestDTO;
 import com.moedas.dto.response.CreateEmpresaResponseDTO;
 import com.moedas.entities.Empresa;
 import com.moedas.repositories.EmpresaRepository;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.exceptions.HttpStatusException;
 import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor
@@ -37,6 +39,14 @@ public class EmpresaService {
         return createEmpresaDTO(empresa);
     }
 
+    public void deletaEmpresa(Long id){
+        try {
+            empresaRepository.deleteById(id);
+        }catch (Exception e){
+            throw new HttpStatusException(HttpStatus.NOT_FOUND, "Empresa com o id inexistente");
+        }
+    }
+
     public CreateEmpresaResponseDTO viewEmpresa(Long id) {
         if (!empresaRepository.existsById(id)) {
             throw new HttpStatusException(HttpStatus.NOT_FOUND, "Empresa com o id inexistente");
@@ -58,6 +68,12 @@ public class EmpresaService {
                         .senha(empresa.getSenha())
                         .email(empresa.getEmail())
                         .razaoSocial(empresa.getRazaoSocial()).build()).toList();
+    }
+
+    public CreateEmpresaResponseDTO listaById(long id) {
+        @NonNull Optional<Empresa> empresa = empresaRepository.findById(id);
+
+        return createEmpresaDTO(empresa.orElse(null));
     }
 
     public void deleteEmpresa(Long id) {

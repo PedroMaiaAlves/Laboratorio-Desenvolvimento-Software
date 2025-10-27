@@ -56,6 +56,23 @@ public class EmpresaController {
         }
     }
 
+    @Get("/view/{id}")
+    @Secured(SecurityRule.IS_ANONYMOUS)
+    public HttpResponse<?> viewEmpresa(@PathVariable Long id){
+        try{
+            return HttpResponse.ok(empresaService.viewEmpresa(id));
+        }catch (Exception e) {
+            return HttpResponse.badRequest(e.getMessage());
+        }
+    }
+
+    @Delete("/{id}")
+    @Secured(SecurityRule.IS_ANONYMOUS)
+    public HttpResponse<Void> deleteEmpresa(@PathVariable Long id){
+            empresaService.deletaEmpresa(id);
+        return HttpResponse.noContent();
+    }
+
     @Post("/{id}/vantagens")
     @Secured("EMPRESA")
     public Vantagem criarVantagem(@PathVariable Long id, @Body VantagemRequest request) {
