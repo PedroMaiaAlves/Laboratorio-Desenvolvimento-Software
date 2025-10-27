@@ -219,7 +219,7 @@ classDiagram
 
 ### Diagrama de Pacotes
 
-![Diagrama de Pacotes]https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio%2003/Arquitetura.png)
+![Diagrama de Pacotes](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio%2003/Arquitetura.png)
 ---
 
 ### 🧩 Explicação do modelo:
