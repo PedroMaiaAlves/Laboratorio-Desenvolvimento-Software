@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerenciamento</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="empresa.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -60,6 +61,26 @@
                 <p><strong>CPF:</strong> <span id="detail-aluno-cpf"></span></p>
                 <p><strong>RG:</strong> <span id="detail-aluno-rg"></span></p>
                 <p><strong>Endereço:</strong> <span id="detail-aluno-endereco"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela de Detalhes da Empresa -->
+    <div id="empresa-detail-view" class="container hidden">
+        <button id="back-to-list-btn-empresa" class="btn btn-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+            <span>Voltar</span>
+        </button>
+        <div class="empresa-profile">
+            <div class="empresa-profile-header">
+                <img id="detail-empresa-img" src="https://static.thenounproject.com/png/1584264-200.png" alt="Logo da Empresa">
+                <h2 id="detail-empresa-nome"></h2>
+            </div>
+            <div class="empresa-profile-body">
+                <p><strong>Email:</strong> <span id="detail-empresa-email"></span></p>
+                <p><strong>CNPJ:</strong> <span id="detail-empresa-cnpj"></span></p>
             </div>
         </div>
     </div>

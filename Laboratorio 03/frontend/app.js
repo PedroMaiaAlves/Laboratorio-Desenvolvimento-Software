@@ -196,28 +196,47 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const renderEmpresas = (empresas) => {
-        empresasList.innerHTML = '';
-        if (empresas.length === 0) {
-            empresasList.innerHTML = '<p>Nenhuma empresa cadastrada.</p>';
-            return;
-        }
-        empresas.forEach(empresa => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.dataset.id = empresa.id;
-            card.innerHTML = `
-                <div class="card-content">
-                    <h3>${empresa.razaoSocial}</h3>
-                    <p>CNPJ: ${empresa.cnpj} | Tel: ${empresa.telefone}</p>
-                </div>
-                <div class="card-actions">
-                    <button class="btn-icon edit-btn" data-id="${empresa.id}" aria-label="Editar" title="Editar"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" /></svg></button>
-                    <button class="btn-icon delete-btn" data-id="${empresa.id}" aria-label="Excluir" title="Excluir"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.124-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.077-2.09.921-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg></button>
-                </div>
-            `;
-            empresasList.appendChild(card);
+    empresasList.innerHTML = '';
+
+    if (empresas.length === 0) {
+        empresasList.innerHTML = '<p>Nenhuma empresa cadastrada.</p>';
+        return;
+    }
+
+    empresas.forEach(empresa => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.dataset.id = empresa.id;
+
+        card.innerHTML = `
+            <div class="card-content">
+                <h3>${empresa.razaoSocial}</h3>
+                <p>CNPJ: ${empresa.cnpj} | Tel: ${empresa.telefone}</p>
+            </div>
+            <div class="card-actions">
+                <button class="btn-icon edit-btn" data-id="${empresa.id}" aria-label="Editar" title="Editar">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
+                    </svg>
+                </button>
+                <button class="btn-icon delete-btn" data-id="${empresa.id}" aria-label="Excluir" title="Excluir">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.124-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.077-2.09.921-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                    </svg>
+                </button>
+            </div>
+        `;
+
+        // 🔹 Evento: clicar no conteúdo abre os detalhes
+        const content = card.querySelector('.card-content');
+        content.addEventListener('click', () => {
+            showEmpresaDetail(empresa);
         });
-    };
+
+        empresasList.appendChild(card);
+    });
+};
+
 
     const loadData = async () => {
         showListView();
@@ -265,6 +284,48 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         loadData();
     };
+
+    // --- ELEMENTOS DA EMPRESA ---
+const empresaDetailView = document.getElementById('empresa-detail-view');
+const backToListBtnEmpresa = document.getElementById('back-to-list-btn-empresa');
+
+// Campos de detalhe
+const detailEmpresaNome = document.getElementById('detail-empresa-nome');
+const detailEmpresaEmail = document.getElementById('detail-empresa-email');
+const detailEmpresaCnpj = document.getElementById('detail-empresa-cnpj');
+const detailEmpresaImg = document.getElementById('detail-empresa-img');
+
+// --- FUNÇÃO PARA MOSTRAR DETALHES DA EMPRESA ---
+const showEmpresaDetail = (empresa) => {
+    // Oculta as listas e o cabeçalho
+    mainContentAlunos.classList.add('hidden');
+    mainContentEmpresas.classList.add('hidden');
+    document.querySelector('header').classList.add('hidden');
+
+    // Exibe o modal de detalhes
+    empresaDetailView.classList.remove('hidden');
+
+    // Preenche os dados no modal
+    detailEmpresaNome.textContent = empresa.razaoSocial;
+    detailEmpresaEmail.textContent = empresa.email;
+    detailEmpresaCnpj.textContent = empresa.cnpj;
+
+    // Se a empresa tiver logo, substitui a imagem padrão
+    if (empresa.logoUrl) {
+        detailEmpresaImg.src = empresa.logoUrl;
+    } else {
+        detailEmpresaImg.src = 'https://static.thenounproject.com/png/1584264-200.png';
+    }
+};
+
+// --- FUNÇÃO PARA VOLTAR À LISTA ---
+backToListBtnEmpresa.addEventListener('click', () => {
+    empresaDetailView.classList.add('hidden');
+    document.querySelector('header').classList.remove('hidden');
+
+    // Retorna para a lista de empresas
+    mainContentEmpresas.classList.remove('hidden');
+});
 
     // --- GERENCIAMENTO DE MODAIS ---
     const openModal = (modal) => modal.setAttribute('aria-hidden', 'false');
