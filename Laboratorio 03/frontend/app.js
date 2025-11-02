@@ -2,9 +2,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const apiUrls = {
         alunos: 'http://localhost:8080/alunos',
         empresas: 'http://localhost:8080/empresas',
+        professores: 'http://localhost:8080/professores', // Endpoint de exemplo
     };
 
-    let currentView = 'alunos'; // 'alunos' ou 'empresas'
+    const state = {
+        alunos: [],
+        empresas: [],
+        professores: [],
+        currentView: 'alunos',
+        currentItemId: null,
+    };
 
     // --- SELETORES GERAIS ---
     const mainTitle = document.getElementById('main-title');
@@ -12,505 +19,376 @@ document.addEventListener('DOMContentLoaded', () => {
     const addBtnText = document.getElementById('add-btn-text');
     const toastContainer = document.getElementById('toast-container');
     const tabs = document.querySelectorAll('.tab-btn');
+    const mainContents = {
+        alunos: document.getElementById('main-content-alunos'),
+        empresas: document.getElementById('main-content-empresas'),
+        professores: document.getElementById('main-content-professores'),
+        acoes: document.getElementById('main-content-acoes'),
+    };
 
-    // --- SELETORES DE ALUNOS ---
-    const mainContentAlunos = document.getElementById('main-content-alunos');
-    const alunosList = document.getElementById('alunos-list');
-    const formAlunoModal = document.getElementById('form-aluno-modal');
-    const deleteAlunoConfirmModal = document.getElementById('delete-aluno-confirm-modal');
-    const alunoForm = document.getElementById('aluno-form');
-    const alunoIdInput = document.getElementById('aluno-id');
-    const formAlunoTitle = document.getElementById('form-aluno-title');
-    const senhaGroup = document.getElementById('senha-group');
-    const deleteAlunoName = document.getElementById('delete-aluno-name');
-    const confirmDeleteAlunoBtn = document.getElementById('confirm-delete-aluno-btn');
-    const alunoDetailView = document.getElementById('aluno-detail-view');
-    const backToListBtn = document.getElementById('back-to-list-btn');
-    const detailAlunoNome = document.getElementById('detail-aluno-nome');
-    const detailAlunoEmail = document.getElementById('detail-aluno-email');
-    const detailAlunoCpf = document.getElementById('detail-aluno-cpf');
-    const detailAlunoRg = document.getElementById('detail-aluno-rg');
-    const detailAlunoEndereco = document.getElementById('detail-aluno-endereco');
+    // --- SELETORES DE LISTAS ---
+    const lists = {
+        alunos: document.getElementById('alunos-list'),
+        empresas: document.getElementById('empresas-list'),
+        professores: document.getElementById('professores-list'),
+    };
 
-    // --- SELETORES DE EMPRESAS ---
-    const mainContentEmpresas = document.getElementById('main-content-empresas');
-    const empresasList = document.getElementById('empresas-list');
-    const formEmpresaModal = document.getElementById('form-empresa-modal');
-    const deleteEmpresaConfirmModal = document.getElementById('delete-empresa-confirm-modal');
-    const empresaForm = document.getElementById('empresa-form');
-    const empresaIdInput = document.getElementById('empresa-id');
-    const formEmpresaTitle = document.getElementById('form-empresa-title');
-    const empresaSenhaGroup = document.getElementById('empresa-senha-group');
-    const deleteEmpresaName = document.getElementById('delete-empresa-name');
-    const confirmDeleteEmpresaBtn = document.getElementById('confirm-delete-empresa-btn');
+    // --- SELETORES DE MODAIS ---
+    const modals = {
+        formAluno: document.getElementById('form-aluno-modal'),
+        deleteAluno: document.getElementById('delete-aluno-confirm-modal'),
+        formEmpresa: document.getElementById('form-empresa-modal'),
+        deleteEmpresa: document.getElementById('delete-empresa-confirm-modal'),
+        formProfessor: document.getElementById('form-professor-modal'),
+        deleteProfessor: document.getElementById('delete-professor-confirm-modal'),
+    };
 
-    let currentAlunoId = null;
-    let currentEmpresaId = null;
+    // --- SELETORES DE FORMULÁRIOS ---
+    const forms = {
+        aluno: document.getElementById('aluno-form'),
+        empresa: document.getElementById('empresa-form'),
+        professor: document.getElementById('professor-form'),
+        distributeCoins: document.getElementById('distribute-coins-form'),
+    };
+
+    // --- SELETORES DE AÇÕES ---
+    const selectAlunoAcao = document.getElementById('select-aluno-acao');
+    const selectProfessorAcao = document.getElementById('select-professor-acao');
+    const alunoActionsView = document.getElementById('aluno-actions-view');
+    const professorActionsView = document.getElementById('professor-actions-view');
+    const alunoSaldo = document.getElementById('aluno-saldo');
+    const alunoExtratoList = document.getElementById('aluno-extrato-list');
+    const professorExtratoList = document.getElementById('professor-extrato-list');
 
     // --- FUNÇÕES DE API GENÉRICAS ---
     const fetchData = async (entity) => {
         try {
-            const response = await fetch(`${apiUrls[entity]}/all`);
-            if (!response.ok) throw new Error(`Erro ao buscar ${entity}.`);
-            return await response.json();
-        } catch (error) {
-            showToast(error.message, 'error');
-            return [];
-        }
-    };
-
-    const fetchSingle = async (entity, id) => {
-        try {
-            const url = entity === 'alunos' ? `${apiUrls.alunos}/view/${id}` : `${apiUrls.empresas}/view/${id}`;
+            const url = entity === 'professores' ? apiUrls[entity] : `${apiUrls[entity]}/all`;
             const response = await fetch(url);
-            if (!response.ok) throw new Error(`${entity.slice(0, -1)} não encontrado.`);
-            return await response.json();
+            if (!response.ok) throw new Error(`Erro ao buscar ${entity}.`);
+            state[entity] = await response.json();
         } catch (error) {
             showToast(error.message, 'error');
+            state[entity] = [];
         }
     };
 
-    // --- FUNÇÕES DA API (ALUNOS) ---
-    const createAluno = async (aluno) => {
+    const apiCall = async (url, method, body = null) => {
         try {
-            const response = await fetch(`${apiUrls.alunos}/cadastrar`, {
-                method: 'POST',
+            const options = {
+                method,
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(aluno),
-            });
+            };
+            if (body) options.body = JSON.stringify(body);
+
+            const response = await fetch(url, options);
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ message: 'Erro ao criar aluno.' }));
-                throw new Error(errorData.message || 'Erro ao criar aluno.');
+                const errorData = await response.json().catch(() => ({ message: `Erro na operação de ${method}` }));
+                throw new Error(errorData.message);
             }
-            return await response.json();
+            return response.status !== 204 ? await response.json() : true;
         } catch (error) {
             showToast(error.message, 'error');
             return null;
         }
     };
 
-    const updateAluno = async (id, aluno) => {
-        try {
-            const response = await fetch(`${apiUrls.alunos}/update/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(aluno),
-            });
-            if (!response.ok) {
-                 const errorData = await response.json().catch(() => ({ message: 'Erro ao atualizar aluno.' }));
-                throw new Error(errorData.message || 'Erro ao atualizar aluno.');
-            }
-            return await response.json();
-        } catch (error) {
-            showToast(error.message, 'error');
-            return null;
-        }
-    };
-
-    const deleteAluno = async (id) => {
-        try {
-            const response = await fetch(`${apiUrls.alunos}/${id}`, {
-                method: 'DELETE',
-            });
-            if (!response.ok) throw new Error('Erro ao deletar aluno.');
-            return true;
-        } catch (error) {
-            showToast(error.message, 'error');
-            return false;
-        }
-    };
-
-    // --- FUNÇÕES DA API (EMPRESAS) ---
-    const createEmpresa = async (empresa) => {
-        try {
-            const response = await fetch(`${apiUrls.empresas}/create`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(empresa),
-            });
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ message: 'Erro ao criar empresa.' }));
-                throw new Error(errorData.message || 'Erro ao criar empresa.');
-            }
-            return await response.json();
-        } catch (error) {
-            showToast(error.message, 'error');
-            return null;
-        }
-    };
-
-    const updateEmpresa = async (id, empresa) => {
-        try {
-            const response = await fetch(`${apiUrls.empresas}/update/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(empresa),
-            });
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ message: 'Erro ao atualizar empresa.' }));
-                throw new Error(errorData.message || 'Erro ao atualizar empresa.');
-            }
-            return await response.json();
-        } catch (error) {
-            showToast(error.message, 'error');
-            return null;
-        }
-    };
-
-    const deleteEmpresa = async (id) => {
-        try {
-            const response = await fetch(`${apiUrls.empresas}/${id}`, {
-                method: 'DELETE',
-            });
-            if (!response.ok) throw new Error('Erro ao deletar empresa.');
-            return true;
-        } catch (error) {
-            showToast(error.message, 'error');
-            return false;
-        }
-    };
-
-    // --- RENDERIZAÇÃO ---
-    const renderAlunos = (alunos) => {
-        alunosList.innerHTML = '';
-        if (alunos.length === 0) {
-            alunosList.innerHTML = '<p>Nenhum aluno cadastrado.</p>';
-            return;
-        }
-        alunos.forEach(aluno => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.dataset.id = aluno.id;
-            card.innerHTML = `
-                <div class="card-content">
-                    <h3>${aluno.nome}</h3>
-                    <p>${aluno.email}</p>
-                </div>
-                <div class="card-actions">
-                    <button class="btn-icon edit-btn" data-id="${aluno.id}" aria-label="Editar" title="Editar"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" /></svg></button>
-                    <button class="btn-icon delete-btn" data-id="${aluno.id}" aria-label="Excluir" title="Excluir"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.124-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.077-2.09.921-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg></button>
-                </div>
-            `;
-            alunosList.appendChild(card);
-        });
-    };
-
-    const renderEmpresas = (empresas) => {
-    empresasList.innerHTML = '';
-
-    if (empresas.length === 0) {
-        empresasList.innerHTML = '<p>Nenhuma empresa cadastrada.</p>';
-        return;
-    }
-
-    empresas.forEach(empresa => {
+    // --- FUNÇÕES DE RENDERIZAÇÃO ---
+    const renderCard = (item, type) => {
         const card = document.createElement('div');
         card.className = 'card';
-        card.dataset.id = empresa.id;
+        card.dataset.id = item.id;
+        let content = '';
+        if (type === 'alunos') {
+            content = `<h3>${item.nome}</h3><p>${item.email}</p>`;
+        } else if (type === 'empresas') {
+            content = `<h3>${item.razaoSocial}</h3><p>CNPJ: ${item.cnpj}</p>`;
+        } else if (type === 'professores') {
+            content = `<h3>${item.nome}</h3><p>${item.departamento}</p>`;
+        }
 
         card.innerHTML = `
-            <div class="card-content">
-                <h3>${empresa.razaoSocial}</h3>
-                <p>CNPJ: ${empresa.cnpj} | Tel: ${empresa.telefone}</p>
-            </div>
+            <div class="card-content">${content}</div>
             <div class="card-actions">
-                <button class="btn-icon edit-btn" data-id="${empresa.id}" aria-label="Editar" title="Editar">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
-                    </svg>
-                </button>
-                <button class="btn-icon delete-btn" data-id="${empresa.id}" aria-label="Excluir" title="Excluir">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.124-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.077-2.09.921-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                    </svg>
-                </button>
+                <button class="btn-icon edit-btn" title="Editar"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" /></svg></button>
+                <button class="btn-icon delete-btn" title="Excluir"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.124-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.077-2.09.921-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg></button>
             </div>
         `;
+        return card;
+    };
 
-        // 🔹 Evento: clicar no conteúdo abre os detalhes
-        const content = card.querySelector('.card-content');
-        content.addEventListener('click', () => {
-            showEmpresaDetail(empresa);
-        });
+    const render = () => {
+        const view = state.currentView;
+        if (!lists[view]) return;
 
-        empresasList.appendChild(card);
-    });
-};
-
-
-    const loadData = async () => {
-        showListView();
-        if (currentView === 'alunos') {
-            const alunos = await fetchData('alunos');
-            renderAlunos(alunos);
-        } else {
-            const empresas = await fetchData('empresas');
-            renderEmpresas(empresas);
+        const list = lists[view];
+        const data = state[view];
+        list.innerHTML = '';
+        if (data.length === 0) {
+            list.innerHTML = `<p>Nenhum item cadastrado.</p>`;
+            return;
         }
+        data.forEach(item => list.appendChild(renderCard(item, view)));
     };
 
     // --- NAVEGAÇÃO E VISIBILIDADE ---
-    const showListView = () => {
-        alunoDetailView.classList.add('hidden');
-        document.querySelector('header').classList.remove('hidden');
-        if (currentView === 'alunos') {
-            mainContentAlunos.classList.remove('hidden');
-            mainContentEmpresas.classList.add('hidden');
+    const switchView = async (view) => {
+        state.currentView = view;
+        tabs.forEach(tab => tab.classList.toggle('active', tab.dataset.tab === view));
+
+        Object.values(mainContents).forEach(content => content.classList.add('hidden'));
+        mainContents[view].classList.remove('hidden');
+
+        addBtn.classList.toggle('hidden', view === 'acoes');
+
+        const titles = { alunos: 'Alunos', empresas: 'Empresas', professores: 'Professores', acoes: 'Ações' };
+        mainTitle.textContent = titles[view];
+        if (view !== 'acoes') addBtnText.textContent = `Novo ${titles[view].slice(0, -1)}`;
+
+        if (view !== 'acoes') {
+            await fetchData(view);
+            render();
         } else {
-            mainContentAlunos.classList.add('hidden');
-            mainContentEmpresas.classList.remove('hidden');
+            await populateActionSelects();
         }
     };
 
-    const showDetailView = () => {
-        mainContentAlunos.classList.add('hidden');
-        mainContentEmpresas.classList.add('hidden');
-        document.querySelector('header').classList.add('hidden');
-        alunoDetailView.classList.remove('hidden');
+    // --- LÓGICA DE CRUD ---
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const entity = form.id.split('-')[0]; // 'aluno', 'empresa', 'professor'
+        const id = form.querySelector(`#${entity}-id`).value;
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        let url, result;
+        if (entity === 'aluno') {
+            url = id ? `${apiUrls.alunos}/update/${id}` : `${apiUrls.alunos}/cadastrar`;
+            const payload = { nome: data.nome, email: data.email, cpf: data.cpf, rg: data.rg, endereco: data.endereco };
+            if (!id) payload.senha = data.senha;
+            result = await apiCall(url, id ? 'PUT' : 'POST', payload);
+        } else if (entity === 'empresa') {
+            url = id ? `${apiUrls.empresas}/update/${id}` : `${apiUrls.empresas}/create`;
+            const payload = { razaoSocial: data.razaoSocial, cnpj: data.cnpj, email: data.email, telefone: data.telefone };
+            if (!id) payload.senha = data.senha;
+            result = await apiCall(url, id ? 'PUT' : 'POST', payload);
+        } else if (entity === 'professor') {
+            url = id ? `${apiUrls.professores}/${id}` : apiUrls.professores;
+            const payload = { nome: data.nome, email: data.email, cpf: data.cpf, departamento: data.departamento, instituicao: data.instituicao };
+            if (!id) payload.senha = data.senha;
+            result = await apiCall(url, id ? 'PUT' : 'POST', payload);
+        }
+
+        if (result) {
+            closeModal(modals[`form${capitalize(entity)}`]);
+            showToast(`${capitalize(entity)} ${id ? 'atualizado' : 'criado'} com sucesso!`, 'success');
+            await fetchData(entity);
+            render();
+        }
     };
 
-    const switchView = (view) => {
-        currentView = view;
-        tabs.forEach(tab => {
-            tab.classList.toggle('active', tab.dataset.tab === view);
+    const openEditModal = (entity, item) => {
+        const form = forms[entity];
+        form.reset();
+        document.getElementById(`${entity}-id`).value = item.id;
+        document.getElementById(`form-${entity}-title`).textContent = `Editar ${capitalize(entity)}`;
+        document.getElementById(`${entity}-senha-group`).classList.add('hidden');
+
+        for (const key in item) {
+            const input = form.querySelector(`[name="${key}"]`);
+            if (input) input.value = item[key];
+        }
+        // Edge case for razaoSocial
+        if (entity === 'empresa' && item.razaoSocial) {
+            form.querySelector('[name="razaoSocial"]').value = item.razaoSocial;
+        }
+
+        openModal(modals[`form${capitalize(entity)}`]);
+    };
+
+    const openDeleteModal = (entity, item) => {
+        state.currentItemId = item.id;
+        const name = entity === 'empresa' ? item.razaoSocial : item.nome;
+        document.getElementById(`delete-${entity}-name`).textContent = name;
+        openModal(modals[`delete${capitalize(entity)}`]);
+    };
+
+    const confirmDelete = async () => {
+        const entity = state.currentView;
+        const id = state.currentItemId;
+        const url = `${apiUrls[entity]}/${id}`;
+        const success = await apiCall(url, 'DELETE');
+
+        if (success) {
+            closeModal(modals[`delete${capitalize(entity)}`]);
+            showToast(`${capitalize(entity)} excluído com sucesso!`, 'success');
+            state.currentItemId = null;
+            await fetchData(entity);
+            render();
+        }
+    };
+
+    // --- LÓGICA DE AÇÕES ---
+    const populateActionSelects = async () => {
+        await fetchData('alunos');
+        await fetchData('professores');
+        
+        populateSelect(selectAlunoAcao, state.alunos, 'Selecione um aluno');
+        populateSelect(selectProfessorAcao, state.professores, 'Selecione um professor');
+    };
+
+    const populateSelect = (select, items, placeholder) => {
+        select.innerHTML = `<option value="">${placeholder}</option>`;
+        items.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.id;
+            option.textContent = item.nome || item.razaoSocial;
+            select.appendChild(option);
         });
-
-        if (view === 'alunos') {
-            mainTitle.textContent = 'Alunos';
-            addBtnText.textContent = 'Novo Aluno';
-        } else {
-            mainTitle.textContent = 'Empresas';
-            addBtnText.textContent = 'Nova Empresa';
-        }
-        loadData();
     };
 
-    // --- ELEMENTOS DA EMPRESA ---
-const empresaDetailView = document.getElementById('empresa-detail-view');
-const backToListBtnEmpresa = document.getElementById('back-to-list-btn-empresa');
+    const handleAlunoActionSelect = async (e) => {
+        const alunoId = e.target.value;
+        if (!alunoId) {
+            alunoActionsView.classList.add('hidden');
+            return;
+        }
+        alunoActionsView.classList.remove('hidden');
+        
+        // Buscar Saldo
+        const saldoData = await apiCall(`${apiUrls.alunos}/${alunoId}/saldo`, 'GET');
+        if (saldoData && saldoData.saldo !== undefined) {
+            alunoSaldo.textContent = `R$ ${saldoData.saldo.toFixed(2)}`;
+        } else {
+            alunoSaldo.textContent = 'Erro ao buscar saldo.';
+        }
 
-// Campos de detalhe
-const detailEmpresaNome = document.getElementById('detail-empresa-nome');
-const detailEmpresaEmail = document.getElementById('detail-empresa-email');
-const detailEmpresaCnpj = document.getElementById('detail-empresa-cnpj');
-const detailEmpresaImg = document.getElementById('detail-empresa-img');
+        // Buscar Extrato
+        const extratoData = await apiCall(`${apiUrls.alunos}/${alunoId}/extrato-transacoes`, 'GET');
+        alunoExtratoList.innerHTML = '';
+        if (extratoData && extratoData.length > 0) {
+            const table = createStatementTable(extratoData);
+            alunoExtratoList.appendChild(table);
+        } else {
+            alunoExtratoList.innerHTML = '<p>Nenhuma transação encontrada.</p>';
+        }
+    };
 
-// --- FUNÇÃO PARA MOSTRAR DETALHES DA EMPRESA ---
-const showEmpresaDetail = (empresa) => {
-    // Oculta as listas e o cabeçalho
-    mainContentAlunos.classList.add('hidden');
-    mainContentEmpresas.classList.add('hidden');
-    document.querySelector('header').classList.add('hidden');
+    const handleProfessorActionSelect = async (e) => {
+        const professorId = e.target.value;
+        if (!professorId) {
+            professorActionsView.classList.add('hidden');
+            return;
+        }
+        professorActionsView.classList.remove('hidden');
+        forms.distributeCoins.querySelector('#distribute-professor-id').value = professorId;
 
-    // Exibe o modal de detalhes
-    empresaDetailView.classList.remove('hidden');
+        // Buscar Extrato do Professor
+        const extratoData = await apiCall(`${apiUrls.professores}/${professorId}/extrato`, 'GET');
+        professorExtratoList.innerHTML = '';
+        if (extratoData && extratoData.length > 0) {
+            const table = createStatementTable(extratoData, true);
+            professorExtratoList.appendChild(table);
+        } else {
+            professorExtratoList.innerHTML = '<p>Nenhum envio encontrado.</p>';
+        }
+    };
 
-    // Preenche os dados no modal
-    detailEmpresaNome.textContent = empresa.razaoSocial;
-    detailEmpresaEmail.textContent = empresa.email;
-    detailEmpresaCnpj.textContent = empresa.cnpj;
+    const handleDistributeCoins = async (e) => {
+        e.preventDefault();
+        const professorId = forms.distributeCoins.querySelector('#distribute-professor-id').value;
+        const formData = new FormData(forms.distributeCoins);
+        const data = Object.fromEntries(formData.entries());
+        data.alunoId = parseInt(data.alunoId, 10);
+        data.quantidadeMoedas = parseFloat(data.quantidadeMoedas);
 
-    // Se a empresa tiver logo, substitui a imagem padrão
-    if (empresa.logoUrl) {
-        detailEmpresaImg.src = empresa.logoUrl;
-    } else {
-        detailEmpresaImg.src = 'https://static.thenounproject.com/png/1584264-200.png';
-    }
-};
+        const url = `${apiUrls.professores}/${professorId}/distruibuir-moedas`;
+        const result = await apiCall(url, 'POST', data);
 
-// --- FUNÇÃO PARA VOLTAR À LISTA ---
-backToListBtnEmpresa.addEventListener('click', () => {
-    empresaDetailView.classList.add('hidden');
-    document.querySelector('header').classList.remove('hidden');
+        if (result) {
+            showToast('Moedas distribuídas com sucesso!', 'success');
+            forms.distributeCoins.reset();
+            // Recarregar extrato do professor
+            handleProfessorActionSelect({ target: { value: professorId } });
+        }
+    };
 
-    // Retorna para a lista de empresas
-    mainContentEmpresas.classList.remove('hidden');
-});
+    const createStatementTable = (transactions, isProfessor = false) => {
+        const table = document.createElement('table');
+        table.className = 'data-table';
+        const headers = isProfessor ? ['Aluno', 'Moedas', 'Motivo', 'Data'] : ['Professor', 'Moedas', 'Motivo', 'Data'];
+        table.innerHTML = `<thead><tr><th>${headers.join('</th><th>')}</th></tr></thead>`;
+        const tbody = document.createElement('tbody');
+        transactions.forEach(tx => {
+            const row = document.createElement('tr');
+            const target = isProfessor ? (tx.aluno ? tx.aluno.nome : 'N/A') : (tx.professor ? tx.professor.nome : 'N/A');
+            row.innerHTML = `
+                <td>${target}</td>
+                <td>${tx.quantidadeMoedas.toFixed(2)}</td>
+                <td>${tx.motivo}</td>
+                <td>${new Date(tx.dataHora).toLocaleString()}</td>
+            `;
+            tbody.appendChild(row);
+        });
+        table.appendChild(tbody);
+        return table;
+    };
 
-    // --- GERENCIAMENTO DE MODAIS ---
+    // --- GERENCIAMENTO DE MODAIS E UTILITÁRIOS ---
     const openModal = (modal) => modal.setAttribute('aria-hidden', 'false');
     const closeModal = (modal) => modal.setAttribute('aria-hidden', 'true');
+    const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
-    document.querySelectorAll('[data-close]').forEach(el => {
-        el.addEventListener('click', () => closeModal(el.closest('.modal')));
-    });
+    const init = async () => {
+        // Event Listeners Gerais
+        tabs.forEach(tab => tab.addEventListener('click', () => switchView(tab.dataset.tab)));
+        document.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', () => closeModal(el.closest('.modal'))));
 
-    // --- LÓGICA DE EVENTOS ---
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => switchView(tab.dataset.tab));
-    });
+        // Listeners de Formulário
+        Object.values(forms).forEach(form => form.addEventListener('submit', handleFormSubmit));
+        forms.distributeCoins.addEventListener('submit', handleDistributeCoins);
 
-    addBtn.addEventListener('click', () => {
-        if (currentView === 'alunos') {
-            formAlunoTitle.textContent = 'Cadastrar Novo Aluno';
-            alunoForm.reset();
-            alunoIdInput.value = '';
-            senhaGroup.style.display = 'block';
-            document.getElementById('senha').required = true;
-            openModal(formAlunoModal);
-        } else {
-            formEmpresaTitle.textContent = 'Cadastrar Nova Empresa';
-            empresaForm.reset();
-            empresaIdInput.value = '';
-            empresaSenhaGroup.style.display = 'block';
-            document.getElementById('empresa-senha').required = true;
-            openModal(formEmpresaModal);
-        }
-    });
+        // Listeners de Ações
+        selectAlunoAcao.addEventListener('change', handleAlunoActionSelect);
+        selectProfessorAcao.addEventListener('change', handleProfessorActionSelect);
 
-    backToListBtn.addEventListener('click', loadData);
+        // Listeners de Botões de Exclusão
+        document.getElementById('confirm-delete-aluno-btn').addEventListener('click', confirmDelete);
+        document.getElementById('confirm-delete-empresa-btn').addEventListener('click', confirmDelete);
+        document.getElementById('confirm-delete-professor-btn').addEventListener('click', confirmDelete);
 
-    // Eventos da lista de Alunos
-    alunosList.addEventListener('click', async (e) => {
-        const card = e.target.closest('.card');
-        if (!card) return;
+        // Listener para Abrir Modal de Adição
+        addBtn.addEventListener('click', () => {
+            const entity = state.currentView.slice(0, -1); // aluno, empresa, professore
+            const form = forms[entity];
+            form.reset();
+            document.getElementById(`${entity}-id`).value = '';
+            document.getElementById(`form-${entity}-title`).textContent = `Cadastrar Novo ${capitalize(entity)}`;
+            document.getElementById(`${entity}-senha-group`).classList.remove('hidden');
+            openModal(modals[`form${capitalize(entity)}`]);
+        });
 
-        const id = card.dataset.id;
-        const isEditButton = e.target.closest('.edit-btn');
-        const isDeleteButton = e.target.closest('.delete-btn');
+        // Listeners para Listas (Edição/Exclusão)
+        Object.keys(lists).forEach(entityType => {
+            lists[entityType].addEventListener('click', (e) => {
+                const card = e.target.closest('.card');
+                if (!card) return;
+                const id = card.dataset.id;
+                const item = state[entityType].find(i => i.id == id);
+                if (!item) return;
 
-        if (isEditButton) {
-            const aluno = await fetchSingle('alunos', id);
-            if (aluno) {
-                formAlunoTitle.textContent = 'Editar Aluno';
-                alunoIdInput.value = aluno.id;
-                document.getElementById('nome').value = aluno.nome;
-                document.getElementById('email').value = aluno.email;
-                document.getElementById('cpf').value = aluno.cpf;
-                document.getElementById('rg').value = aluno.rg;
-                document.getElementById('endereco').value = aluno.endereco;
-                senhaGroup.style.display = 'none';
-                document.getElementById('senha').required = false;
-                openModal(formAlunoModal);
-            }
-        } else if (isDeleteButton) {
-            const aluno = await fetchSingle('alunos', id);
-            if (aluno) {
-                currentAlunoId = aluno.id;
-                deleteAlunoName.textContent = aluno.nome;
-                openModal(deleteAlunoConfirmModal);
-            }
-        } else {
-            const aluno = await fetchSingle('alunos', id);
-            if (aluno) {
-                detailAlunoNome.textContent = aluno.nome;
-                detailAlunoEmail.textContent = aluno.email;
-                detailAlunoCpf.textContent = aluno.cpf;
-                detailAlunoRg.textContent = aluno.rg;
-                detailAlunoEndereco.textContent = aluno.endereco;
-                showDetailView();
-            }
-        }
-    });
+                if (e.target.closest('.edit-btn')) {
+                    openEditModal(entityType.slice(0, -1), item);
+                } else if (e.target.closest('.delete-btn')) {
+                    openDeleteModal(entityType.slice(0, -1), item);
+                }
+            });
+        });
 
-    // Eventos da lista de Empresas
-    empresasList.addEventListener('click', async (e) => {
-        const card = e.target.closest('.card');
-        if (!card) return;
-
-        const id = card.dataset.id;
-        const isEditButton = e.target.closest('.edit-btn');
-        const isDeleteButton = e.target.closest('.delete-btn');
-
-        if (isEditButton) {
-            const empresa = await fetchSingle('empresas', id);
-            if (empresa) {
-                formEmpresaTitle.textContent = 'Editar Empresa';
-                empresaIdInput.value = empresa.id;
-                document.getElementById('razaoSocial').value = empresa.razaoSocial;
-                document.getElementById('cnpj').value = empresa.cnpj;
-                document.getElementById('empresa-email').value = empresa.email;
-                document.getElementById('telefone').value = empresa.telefone;
-                empresaSenhaGroup.style.display = 'none';
-                document.getElementById('empresa-senha').required = false;
-                openModal(formEmpresaModal);
-            }
-        } else if (isDeleteButton) {
-            const empresa = await fetchSingle('empresas', id);
-            if (empresa) {
-                currentEmpresaId = empresa.id;
-                deleteEmpresaName.textContent = empresa.razaoSocial;
-                openModal(deleteEmpresaConfirmModal);
-            }
-        } 
-        // Não há tela de detalhe para empresa, então não há 'else'
-    });
-
-    // Submissão de formulários
-    alunoForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = e.target.querySelector('[type="submit"]');
-        btn.disabled = true;
-
-        const id = alunoIdInput.value;
-        const formData = new FormData(alunoForm);
-        const data = Object.fromEntries(formData.entries());
-
-        let result;
-        if (id) {
-            const payload = { nome: data.nome, email: data.email, cpf: data.cpf, rg: data.rg, endereco: data.endereco };
-            result = await updateAluno(id, payload);
-        } else {
-            result = await createAluno(data);
-        }
-
-        if (result) {
-            closeModal(formAlunoModal);
-            showToast(`Aluno ${id ? 'atualizado' : 'criado'} com sucesso!`, 'success');
-            loadData();
-        }
-        btn.disabled = false;
-    });
-
-    empresaForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = e.target.querySelector('[type="submit"]');
-        btn.disabled = true;
-
-        const id = empresaIdInput.value;
-        const formData = new FormData(empresaForm);
-        const data = Object.fromEntries(formData.entries());
-
-        let result;
-        if (id) {
-            const payload = { razaoSocial: data.razaoSocial, cnpj: data.cnpj, telefone: data.telefone };
-            result = await updateEmpresa(id, payload);
-        } else {
-            result = await createEmpresa(data);
-        }
-
-        if (result) {
-            closeModal(formEmpresaModal);
-            showToast(`Empresa ${id ? 'atualizada' : 'criada'} com sucesso!`, 'success');
-            loadData();
-        }
-        btn.disabled = false;
-    });
-
-    // Confirmação de exclusão
-    confirmDeleteAlunoBtn.addEventListener('click', async () => {
-        if (currentAlunoId) {
-            const success = await deleteAluno(currentAlunoId);
-            if (success) {
-                closeModal(deleteAlunoConfirmModal);
-                showToast('Aluno excluído com sucesso!', 'success');
-                loadData();
-            }
-            currentAlunoId = null;
-        }
-    });
-
-    confirmDeleteEmpresaBtn.addEventListener('click', async () => {
-        if (currentEmpresaId) {
-            const success = await deleteEmpresa(currentEmpresaId);
-            if (success) {
-                closeModal(deleteEmpresaConfirmModal);
-                showToast('Empresa excluída com sucesso!', 'success');
-                loadData();
-            }
-            currentEmpresaId = null;
-        }
-    });
+        // Carga inicial
+        await switchView('alunos');
+    };
 
     // --- TOAST ---
     const showToast = (message, type = 'success') => {
@@ -518,13 +396,11 @@ backToListBtnEmpresa.addEventListener('click', () => {
         toast.className = `toast toast-${type}`;
         toast.textContent = message;
         toastContainer.appendChild(toast);
-
         setTimeout(() => {
             toast.style.animation = 'slideOut 0.3s ease forwards';
             toast.addEventListener('animationend', () => toast.remove());
         }, 3000);
     };
 
-    // --- INICIALIZAÇÃO ---
-    loadData();
+    init();
 });

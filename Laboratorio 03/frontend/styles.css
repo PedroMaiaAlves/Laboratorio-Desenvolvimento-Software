@@ -188,16 +188,16 @@ h1 {
     flex-shrink: 0;
 }
 
-/* --- Tela de Detalhes do Aluno --- */
-#aluno-detail-view {
+/* --- Tela de Detalhes (Genérica) --- */
+.detail-view {
     animation: fadeIn 0.3s ease;
 }
 
-#back-to-list-btn {
+.back-to-list-btn {
     margin-bottom: 2rem;
 }
 
-.aluno-profile {
+.profile-card {
     background-color: var(--card-background);
     border-radius: var(--border-radius);
     border: 1px solid var(--border-color);
@@ -205,7 +205,7 @@ h1 {
     padding: 2rem 2.5rem;
 }
 
-.aluno-profile-header {
+.profile-header {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -215,7 +215,7 @@ h1 {
     border-bottom: 1px solid var(--border-color);
 }
 
-#detail-aluno-img {
+.profile-img {
     width: 100px;
     height: 100px;
     border-radius: 50%;
@@ -223,17 +223,17 @@ h1 {
     border: 3px solid var(--border-color);
 }
 
-#detail-aluno-nome {
+.profile-title {
     font-size: 2.25rem;
     font-weight: 700;
 }
 
-.aluno-profile-body p {
+.profile-body p {
     font-size: 1.1rem;
     margin-bottom: 1rem;
 }
 
-.aluno-profile-body p strong {
+.profile-body p strong {
     color: var(--text-color);
     margin-right: 0.5rem;
     font-weight: 600;
@@ -326,16 +326,17 @@ h1 {
     margin-bottom: 0.5rem;
 }
 
-.form-group input {
+.form-group input, .form-group select {
     width: 100%;
     padding: 0.75rem 1rem;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     font-size: 1rem;
+    background-color: white;
     transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
 }
 
-.form-group input:focus {
+.form-group input:focus, .form-group select:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
@@ -358,6 +359,42 @@ h1 {
     gap: 1rem;
     margin-top: 2rem;
 }
+
+/* --- Tabela --- */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--card-background);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -2px var(--shadow-color);
+    overflow: hidden;
+}
+
+.data-table th, .data-table td {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table th {
+    background-color: #F9FAFB;
+    font-weight: 600;
+    color: var(--text-light);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+}
+
+.data-table tbody tr:last-child th,
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+    background-color: #F9FAFB;
+}
+
 
 /* --- Estilos do Toast --- */
 #toast-container {
@@ -425,7 +462,7 @@ h1 {
         padding: 1rem;
     }
 
-    .alunos-grid {
+    .data-grid {
         grid-template-columns: 1fr;
         gap: 1rem;
     }
@@ -435,14 +472,12 @@ h1 {
         padding: 1.5rem;
     }
 
-    .aluno-profile-header {
+    .profile-header {
         flex-direction: column;
         text-align: center;
     }
 
-    #detail-aluno-nome {
+    .profile-title {
         font-size: 1.75rem;
     }
-
-    
 }

@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciamento</title>
+    <title>Gerenciamento Acadêmico</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="empresa.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -18,6 +17,8 @@
                 <div class="tabs">
                     <button class="tab-btn active" data-tab="alunos">Alunos</button>
                     <button class="tab-btn" data-tab="empresas">Empresas</button>
+                    <button class="tab-btn" data-tab="professores">Professores</button>
+                    <button class="tab-btn" data-tab="acoes">Ações</button>
                 </div>
             </div>
             <button id="add-btn" class="btn btn-primary">
@@ -31,32 +32,95 @@
 
     <!-- Seção de Alunos -->
     <main class="container" id="main-content-alunos">
-        <div id="alunos-list" class="data-grid">
-            <!-- Cards dos alunos serão inseridos aqui -->
-        </div>
+        <div id="alunos-list" class="data-grid"></div>
     </main>
 
     <!-- Seção de Empresas -->
     <main class="container hidden" id="main-content-empresas">
-        <div id="empresas-list" class="data-grid">
-            <!-- Cards das empresas serão inseridos aqui -->
+        <div id="empresas-list" class="data-grid"></div>
+    </main>
+
+    <!-- Seção de Professores -->
+    <main class="container hidden" id="main-content-professores">
+        <div id="professores-list" class="data-grid"></div>
+    </main>
+
+    <!-- Seção de Ações -->
+    <main class="container hidden" id="main-content-acoes">
+        <div class="actions-container">
+            <!-- Ações do Aluno -->
+            <div class="action-card">
+                <h2>Ações do Aluno</h2>
+                <div class="form-group">
+                    <label for="select-aluno-acao">Selecione um Aluno</label>
+                    <select id="select-aluno-acao"></select>
+                </div>
+                <div id="aluno-actions-view" class="hidden">
+                    <div class="saldo-container">
+                        <h3>Saldo de Moedas</h3>
+                        <p id="aluno-saldo">R$ 0,00</p>
+                    </div>
+                    <h3>Extrato de Transações</h3>
+                    <div id="aluno-extrato-list">
+                        <p>Nenhuma transação encontrada.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ações do Professor -->
+            <div class="action-card">
+                <h2>Ações do Professor</h2>
+                <div class="form-group">
+                    <label for="select-professor-acao">Selecione um Professor</label>
+                    <select id="select-professor-acao"></select>
+                </div>
+                <div id="professor-actions-view" class="hidden">
+                    <!-- Distribuir Moedas -->
+                    <div id="distribute-coins-container">
+                        <h3>Distribuir Moedas</h3>
+                        <form id="distribute-coins-form">
+                            <input type="hidden" id="distribute-professor-id">
+                            <div class="form-group">
+                                <label for="distribute-aluno-id">ID do Aluno</label>
+                                <input type="number" id="distribute-aluno-id" name="alunoId" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="distribute-quantidade">Quantidade de Moedas</label>
+                                <input type="number" id="distribute-quantidade" name="quantidadeMoedas" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="distribute-motivo">Motivo</label>
+                                <input type="text" id="distribute-motivo" name="motivo" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Enviar Moedas</button>
+                        </form>
+                    </div>
+                    <!-- Extrato do Professor -->
+                    <div id="professor-extrato-container">
+                        <h3>Extrato de Envios</h3>
+                        <div id="professor-extrato-list">
+                            <p>Nenhum envio encontrado.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
     <!-- Tela de Detalhes do Aluno -->
-    <div id="aluno-detail-view" class="container hidden">
-        <button id="back-to-list-btn" class="btn btn-secondary">
+    <div id="aluno-detail-view" class="container detail-view hidden">
+        <button class="btn btn-secondary back-to-list-btn">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
             <span>Voltar</span>
         </button>
-        <div class="aluno-profile">
-            <div class="aluno-profile-header">
-                <img id="detail-aluno-img" src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png" alt="Foto do Aluno">
-                <h2 id="detail-aluno-nome"></h2>
+        <div class="profile-card">
+            <div class="profile-header">
+                <img class="profile-img" src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png" alt="Foto do Aluno">
+                <h2 id="detail-aluno-nome" class="profile-title"></h2>
             </div>
-            <div class="aluno-profile-body">
+            <div class="profile-body">
                 <p><strong>Email:</strong> <span id="detail-aluno-email"></span></p>
                 <p><strong>CPF:</strong> <span id="detail-aluno-cpf"></span></p>
                 <p><strong>RG:</strong> <span id="detail-aluno-rg"></span></p>
@@ -65,43 +129,21 @@
         </div>
     </div>
 
-    <!-- Tela de Detalhes da Empresa -->
-    <div id="empresa-detail-view" class="container hidden">
-        <button id="back-to-list-btn-empresa" class="btn btn-secondary">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-            </svg>
-            <span>Voltar</span>
-        </button>
-        <div class="empresa-profile">
-            <div class="empresa-profile-header">
-                <img id="detail-empresa-img" src="https://static.thenounproject.com/png/1584264-200.png" alt="Logo da Empresa">
-                <h2 id="detail-empresa-nome"></h2>
-            </div>
-            <div class="empresa-profile-body">
-                <p><strong>Email:</strong> <span id="detail-empresa-email"></span></p>
-                <p><strong>CNPJ:</strong> <span id="detail-empresa-cnpj"></span></p>
-            </div>
-        </div>
-    </div>
-
     <!-- MODAIS DE ALUNO -->
     <div id="form-aluno-modal" class="modal" aria-hidden="true">
         <div class="modal-overlay" tabindex="-1" data-close></div>
         <div class="modal-content" role="dialog" aria-modal="true">
-            <button class="modal-close-btn" data-close aria-label="Fechar modal">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"></path></svg>
-            </button>
+            <button class="modal-close-btn" data-close aria-label="Fechar modal">&times;</button>
             <h2 id="form-aluno-title"></h2>
             <form id="aluno-form">
                 <input type="hidden" id="aluno-id">
-                <div class="form-group"><label for="nome">Nome Completo</label><input type="text" id="nome" name="nome" required><span class="error-message"></span></div>
-                <div class="form-group"><label for="email">Email</label><input type="email" id="email" name="email" required><span class="error-message"></span></div>
-                <div class="form-group"><label for="cpf">CPF</label><input type="text" id="cpf" name="cpf" required pattern="[0-9]{11}" title="CPF deve conter 11 números."><span class="error-message"></span></div>
-                <div class="form-group"><label for="rg">RG</label><input type="text" id="rg" name="rg" required><span class="error-message"></span></div>
-                <div class="form-group"><label for="endereco">Endereço</label><input type="text" id="endereco" name="endereco" required><span class="error-message"></span></div>
-                <div class="form-group" id="senha-group"><label for="senha">Senha</label><input type="password" id="senha" name="senha" required minlength="6"><span class="error-message"></span></div>
-                <div class="form-actions"><button type="button" class="btn btn-secondary" data-close>Cancelar</button><button type="submit" id="form-submit-btn" class="btn btn-primary">Salvar</button></div>
+                <div class="form-group"><label for="nome">Nome Completo</label><input type="text" id="nome" name="nome" required></div>
+                <div class="form-group"><label for="email">Email</label><input type="email" id="email" name="email" required></div>
+                <div class="form-group"><label for="cpf">CPF</label><input type="text" id="cpf" name="cpf" required pattern="[0-9]{11}" title="CPF deve conter 11 números."></div>
+                <div class="form-group"><label for="rg">RG</label><input type="text" id="rg" name="rg" required></div>
+                <div class="form-group"><label for="endereco">Endereço</label><input type="text" id="endereco" name="endereco" required></div>
+                <div class="form-group" id="senha-group"><label for="senha">Senha</label><input type="password" id="senha" name="senha" required minlength="6"></div>
+                <div class="form-actions"><button type="button" class="btn btn-secondary" data-close>Cancelar</button><button type="submit" class="btn btn-primary">Salvar</button></div>
             </form>
         </div>
     </div>
@@ -109,7 +151,7 @@
         <div class="modal-overlay" tabindex="-1" data-close></div>
         <div class="modal-content" role="dialog" aria-modal="true">
             <h2>Confirmar Exclusão</h2>
-            <p>Você tem certeza que deseja excluir o aluno <strong id="delete-aluno-name"></strong>? Esta ação não pode ser desfeita.</p>
+            <p>Deseja excluir o aluno <strong id="delete-aluno-name"></strong>?</p>
             <div class="form-actions"><button type="button" class="btn btn-secondary" data-close>Cancelar</button><button type="button" id="confirm-delete-aluno-btn" class="btn btn-danger">Excluir</button></div>
         </div>
     </div>
@@ -118,18 +160,16 @@
     <div id="form-empresa-modal" class="modal" aria-hidden="true">
         <div class="modal-overlay" tabindex="-1" data-close></div>
         <div class="modal-content" role="dialog" aria-modal="true">
-            <button class="modal-close-btn" data-close aria-label="Fechar modal">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"></path></svg>
-            </button>
+            <button class="modal-close-btn" data-close aria-label="Fechar modal">&times;</button>
             <h2 id="form-empresa-title"></h2>
             <form id="empresa-form">
                 <input type="hidden" id="empresa-id">
-                <div class="form-group"><label for="razaoSocial">Razão Social</label><input type="text" id="razaoSocial" name="razaoSocial" required><span class="error-message"></span></div>
-                <div class="form-group"><label for="cnpj">CNPJ</label><input type="text" id="cnpj" name="cnpj" required pattern="[0-9]+" title="CNPJ deve conter apenas números."><span class="error-message"></span></div>
-                <div class="form-group"><label for="empresa-email">Email</label><input type="email" id="empresa-email" name="email" required><span class="error-message"></span></div>
-                <div class="form-group"><label for="telefone">Telefone</label><input type="text" id="telefone" name="telefone" required pattern="[0-9]+" title="Telefone deve conter apenas números."><span class="error-message"></span></div>
-                <div class="form-group" id="empresa-senha-group"><label for="empresa-senha">Senha</label><input type="password" id="empresa-senha" name="senha" required minlength="6"><span class="error-message"></span></div>
-                <div class="form-actions"><button type="button" class="btn btn-secondary" data-close>Cancelar</button><button type="submit" id="form-empresa-submit-btn" class="btn btn-primary">Salvar</button></div>
+                <div class="form-group"><label for="razaoSocial">Razão Social</label><input type="text" id="razaoSocial" name="razaoSocial" required></div>
+                <div class="form-group"><label for="cnpj">CNPJ</label><input type="text" id="cnpj" name="cnpj" required pattern="[0-9]+"></div>
+                <div class="form-group"><label for="empresa-email">Email</label><input type="email" id="empresa-email" name="email" required></div>
+                <div class="form-group"><label for="telefone">Telefone</label><input type="text" id="telefone" name="telefone" required pattern="[0-9]+"></div>
+                <div class="form-group" id="empresa-senha-group"><label for="empresa-senha">Senha</label><input type="password" id="empresa-senha" name="senha" required minlength="6"></div>
+                <div class="form-actions"><button type="button" class="btn btn-secondary" data-close>Cancelar</button><button type="submit" class="btn btn-primary">Salvar</button></div>
             </form>
         </div>
     </div>
@@ -137,8 +177,35 @@
         <div class="modal-overlay" tabindex="-1" data-close></div>
         <div class="modal-content" role="dialog" aria-modal="true">
             <h2>Confirmar Exclusão</h2>
-            <p>Você tem certeza que deseja excluir a empresa <strong id="delete-empresa-name"></strong>? Esta ação não pode ser desfeita.</p>
+            <p>Deseja excluir a empresa <strong id="delete-empresa-name"></strong>?</p>
             <div class="form-actions"><button type="button" class="btn btn-secondary" data-close>Cancelar</button><button type="button" id="confirm-delete-empresa-btn" class="btn btn-danger">Excluir</button></div>
+        </div>
+    </div>
+
+    <!-- MODAIS DE PROFESSOR -->
+    <div id="form-professor-modal" class="modal" aria-hidden="true">
+        <div class="modal-overlay" tabindex="-1" data-close></div>
+        <div class="modal-content" role="dialog" aria-modal="true">
+            <button class="modal-close-btn" data-close aria-label="Fechar modal">&times;</button>
+            <h2 id="form-professor-title"></h2>
+            <form id="professor-form">
+                <input type="hidden" id="professor-id">
+                <div class="form-group"><label for="professor-nome">Nome Completo</label><input type="text" id="professor-nome" name="nome" required></div>
+                <div class="form-group"><label for="professor-email">Email</label><input type="email" id="professor-email" name="email" required></div>
+                <div class="form-group"><label for="professor-cpf">CPF</label><input type="text" id="professor-cpf" name="cpf" required pattern="[0-9]{11}"></div>
+                <div class="form-group"><label for="professor-departamento">Departamento</label><input type="text" id="professor-departamento" name="departamento" required></div>
+                <div class="form-group"><label for="professor-instituicao">Instituição</label><input type="text" id="professor-instituicao" name="instituicao" required></div>
+                <div class="form-group" id="professor-senha-group"><label for="professor-senha">Senha</label><input type="password" id="professor-senha" name="senha" required minlength="6"></div>
+                <div class="form-actions"><button type="button" class="btn btn-secondary" data-close>Cancelar</button><button type="submit" class="btn btn-primary">Salvar</button></div>
+            </form>
+        </div>
+    </div>
+    <div id="delete-professor-confirm-modal" class="modal" aria-hidden="true">
+        <div class="modal-overlay" tabindex="-1" data-close></div>
+        <div class="modal-content" role="dialog" aria-modal="true">
+            <h2>Confirmar Exclusão</h2>
+            <p>Deseja excluir o professor <strong id="delete-professor-name"></strong>?</p>
+            <div class="form-actions"><button type="button" class="btn btn-secondary" data-close>Cancelar</button><button type="button" id="confirm-delete-professor-btn" class="btn btn-danger">Excluir</button></div>
         </div>
     </div>
 
