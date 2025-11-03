@@ -62,10 +62,10 @@ public class MoedaService {
     @Transactional
     public void adicionarMoedasSemestrais() {
         professorRepository.findAll().forEach(professor -> {
-            double novoSaldo = professor.getSaldoMoedas() + 1000;
+            double novoSaldo = professor.getSaldoMoedas() + 100000;
             professor.setSaldoMoedas(novoSaldo);
             professorRepository.update(professor);
-            log.info("Adicionadas 1000 moedas semestrais para professor {}. Novo saldo: {}",
+            log.info("Adicionadas 100000 moedas semestrais para professor {}. Novo saldo: {}",
                     professor.getNome(), novoSaldo);
         });
     }

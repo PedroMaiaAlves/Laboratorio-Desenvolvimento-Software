@@ -94,31 +94,31 @@ public class AlunoController {
     }
 
     @Get("/vantagens")
-    @Secured("ALUNO")
+    @Secured(SecurityRule.IS_ANONYMOUS)
     public List<Vantagem> getVantagens() {
         return vantagemRepository.findByAtivaTrue();
     }
 
     @Post("/{id}/resgatar")
-    @Secured("ALUNO")
+    @Secured(SecurityRule.IS_ANONYMOUS)
     public Resgate resgatarVantagem(@PathVariable Long id, @Body ResgateRequest request) {
         return resgateService.resgatarVantagem(id, request);
     }
 
     @Get("/{id}/extrato-transacoes")
-    @Secured("ALUNO")
+    @Secured(SecurityRule.IS_ANONYMOUS)
     public List<Transacao> getExtratoTransacoes(@PathVariable Long id) {
         return transacaoRepository.findByAlunoIdOrderByDataHoraDesc(id);
     }
 
     @Get("/{id}/extrato-resgates")
-    @Secured("ALUNO")
+    @Secured(SecurityRule.IS_ANONYMOUS)
     public List<Resgate> getExtratoResgates(@PathVariable Long id) {
         return resgateRepository.findByAlunoIdOrderByDataHoraDesc(id);
     }
 
     @Get("/{id}/saldo")
-    @Secured("ALUNO")
+    @Secured(SecurityRule.IS_ANONYMOUS)
     public Map<String, Double> getSaldo(@PathVariable Long id) {
         double saldo = moedaService.consultarSaldoAluno(id);
         return Map.of("saldo", saldo);

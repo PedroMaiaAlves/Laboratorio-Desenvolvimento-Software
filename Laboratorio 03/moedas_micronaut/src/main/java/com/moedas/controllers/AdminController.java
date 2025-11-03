@@ -9,14 +9,13 @@ import lombok.RequiredArgsConstructor;
 import java.util.Map;
 
 @Controller("/admin")
-@Secured(SecurityRule.IS_AUTHENTICATED)
 @RequiredArgsConstructor
 public class AdminController {
 
     private final MoedaService moedaService;
 
     @Post("/adicionar-moedas-semestrais")
-    @Secured({"PROFESSOR", "ADMIN"})
+    @Secured(SecurityRule.IS_ANONYMOUS)
     public Map<String, String> adicionarMoedasSemestrais() {
         moedaService.adicionarMoedasSemestrais();
         return Map.of("message", "Moedas semestrais adicionadas a todos os professores");

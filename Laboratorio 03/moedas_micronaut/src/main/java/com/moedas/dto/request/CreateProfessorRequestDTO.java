@@ -1,19 +1,23 @@
 package com.moedas.dto.request;
 
+import com.moedas.entities.Instituicao;
 import io.micronaut.serde.annotation.Serdeable;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Serdeable
-public class VantagemRequest {
+public class CreateProfessorRequestDTO {
+
     private String nome;
-    private String descricao;
-    private String fotoUrl;
-    private double custoMoedas;
+    private String email;
+    private String senha;
+    private String cpf;
 }

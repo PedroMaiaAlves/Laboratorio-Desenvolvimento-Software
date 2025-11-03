@@ -1,5 +1,6 @@
 package com.moedas.entities;
 
+import io.micronaut.serde.annotation.Serdeable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 @Entity(name = "transacao")
 @Data
 @NoArgsConstructor
+@Serdeable
 @AllArgsConstructor
 @Builder
 public class Transacao {
