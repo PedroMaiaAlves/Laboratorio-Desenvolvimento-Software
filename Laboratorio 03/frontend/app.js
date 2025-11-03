@@ -307,14 +307,53 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const id = forms.distributeCoins.querySelector('#distribute-professor-id').value;
         const { alunoId, quantidadeMoedas, motivo } = Object.fromEntries(new FormData(forms.distributeCoins));
-        const result = await apiCall(`${apiUrls.professores}/${id}/distruibuir-moedas`, 'POST', { 
+        
+        // Buscar informações do professor e do aluno
+        const professor = state.professores.find(p => p.id == id);
+        const aluno = state.alunos.find(a => a.id == alunoId);
+        
+        if (!professor || !aluno) {
+            showToast('Erro: Professor ou Aluno não encontrado', 'error');
+            return;
+        }
+
+        const result = await apiCall(`${apiUrls.professores}/${id}/distribuir_moedas`, 'POST', { 
             alunoId: parseInt(alunoId), 
             quantidadeMoedas: parseFloat(quantidadeMoedas), 
             motivo 
         });
 
         if (result) {
-            showToast('Moedas distribuídas com sucesso!', 'success');
+            console.log('Transação de moedas bem sucedida, enviando emails para:', {
+                professor: professor.nome,
+                professorEmail: professor.email,
+                aluno: aluno.nome,
+                alunoEmail: aluno.email
+            });
+
+            // Enviar notificações por email
+            try {
+                const emailResult = await EmailService.sendCoinTransferNotification({
+                    professorName: professor.nome,
+                    professorEmail: professor.email,
+                    studentName: aluno.nome,
+                    studentEmail: aluno.email,
+                    coinAmount: parseFloat(quantidadeMoedas),
+                    reason: motivo
+                });
+
+                console.log('Resultado do envio de email:', emailResult);
+
+                if (emailResult.success) {
+                    showToast('Moedas distribuídas e notificações enviadas com sucesso!', 'success');
+                } else {
+                    showToast('Moedas distribuídas, mas houve um erro ao enviar as notificações.', 'warning');
+                }
+            } catch (error) {
+                console.error('Erro ao enviar emails:', error);
+                showToast('Moedas distribuídas, mas houve um erro ao enviar as notificações: ' + error.message, 'warning');
+            }
+
             forms.distributeCoins.reset();
             document.getElementById('distribute-professor-id').value = id;
             const extrato = await apiCall(`${apiUrls.professores}/${id}/extrato`, 'GET');
