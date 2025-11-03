@@ -157,13 +157,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         const form = e.target;
-        const entity = getSingular(form.id.split('-')[0] + 's');
+        const formId = form.getAttribute('id'); // Use getAttribute to avoid conflict with input name="id"
+
+        let entity, entityPlural;
+        if (formId === 'aluno-form') {
+            entity = 'aluno';
+            entityPlural = 'alunos';
+        } else if (formId === 'empresa-form') {
+            entity = 'empresa';
+            entityPlural = 'empresas';
+        } else if (formId === 'professor-form') {
+            entity = 'professor';
+            entityPlural = 'professores';
+        } else {
+            return; // Not a form we handle
+        }
+
         const id = form.querySelector(`[name="id"]`).value;
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
 
         let url, payload, result;
-        const entityPlural = state.currentView;
 
         if (entity === 'aluno') {
             url = id ? `${apiUrls.alunos}/update/${id}` : `${apiUrls.alunos}/cadastrar`;
@@ -185,7 +199,10 @@ document.addEventListener('DOMContentLoaded', () => {
             closeModal(modals[`form${capitalize(entity)}`]);
             showToast(`${capitalize(entity)} ${id ? 'atualizado' : 'criado'} com sucesso!`, 'success');
             await fetchData(entityPlural);
-            renderAll();
+
+            if (state.currentView === entityPlural) {
+                renderAll();
+            }
         }
     };
 
