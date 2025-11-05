@@ -307,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const id = forms.distributeCoins.querySelector('#distribute-professor-id').value;
         const { alunoId, quantidadeMoedas, motivo } = Object.fromEntries(new FormData(forms.distributeCoins));
-        const result = await apiCall(`${apiUrls.professores}/${id}/distruibuir-moedas`, 'POST', { 
+        const result = await apiCall(`${apiUrls.professores}/${id}/distribuir_moedas`, 'POST', { 
             alunoId: parseInt(alunoId), 
             quantidadeMoedas: parseFloat(quantidadeMoedas), 
             motivo 

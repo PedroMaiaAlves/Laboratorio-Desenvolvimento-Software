@@ -30,6 +30,7 @@ public class VantagemService {
                 .custoMoedas(request.getCustoMoedas())
                 .empresa(empresa)
                 .ativa(true)
+                .alunoId(null) // Inicialmente sem aluno associado
                 .build();
 
         vantagem = vantagemRepository.save(vantagem);
@@ -45,6 +46,37 @@ public class VantagemService {
 
     public List<Vantagem> listarVantagensPorEmpresa(Long empresaId) {
         return vantagemRepository.findByEmpresaId(empresaId);
+    }
+
+    // NOVO MÉTODO: Listar vantagens por aluno
+    public List<Vantagem> listarVantagensPorAluno(Long alunoId) {
+        return vantagemRepository.findByAlunoId(alunoId);
+    }
+
+    // NOVO MÉTODO: Listar vantagens disponíveis para resgate
+    public List<Vantagem> listarVantagensDisponiveis() {
+        return vantagemRepository.findByAlunoIdIsNullAndAtivaTrue();
+    }
+
+    // NOVO MÉTODO: Resgatar vantagem (associar a um aluno)
+    public Vantagem resgatarVantagem(Long vantagemId, Long alunoId) {
+        Vantagem vantagem = vantagemRepository.findById(vantagemId)
+                .orElseThrow(() -> new RuntimeException("Vantagem não encontrada"));
+
+        if (!vantagem.isAtiva()) {
+            throw new RuntimeException("Vantagem não está ativa");
+        }
+
+        if (vantagem.getAlunoId() != null) {
+            throw new RuntimeException("Vantagem já foi resgatada");
+        }
+
+        vantagem.setAlunoId(alunoId);
+        vantagem = vantagemRepository.update(vantagem);
+
+        log.info("Vantagem {} resgatada pelo aluno {}", vantagem.getNome(), alunoId);
+
+        return vantagem;
     }
 
     public Vantagem toggleVantagem(Long vantagemId, Long empresaId) {
