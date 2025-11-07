@@ -1,11 +1,13 @@
 package com.moedas.entities;
 
+import io.micronaut.serde.annotation.Serdeable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Serdeable
 @Entity(name = "aluno")
 @Builder
 @NoArgsConstructor

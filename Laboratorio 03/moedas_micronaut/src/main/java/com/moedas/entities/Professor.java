@@ -1,5 +1,6 @@
 package com.moedas.entities;
 
+import io.micronaut.serde.annotation.Serdeable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Serdeable
 public class Professor {
 
     @Id

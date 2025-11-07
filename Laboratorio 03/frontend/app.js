@@ -135,6 +135,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- NAVEGAÇÃO E VISIBILIDADE ---
     const switchView = async (view) => {
+        // Limpar campos da aba de ações ao sair dela
+        if (state.currentView === 'acoes' && view !== 'acoes') {
+            clearActionFields();
+        }
+        
         state.currentView = view;
         tabs.forEach(tab => tab.classList.toggle('active', tab.dataset.tab === view));
         Object.values(mainContents).forEach(content => content.classList.add('hidden'));
@@ -269,6 +274,27 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- LÓGICA DE AÇÕES ---
+    const clearActionFields = () => {
+        // Limpar select de aluno e esconder view
+        actionSelectors.selectAluno.value = '';
+        actionSelectors.alunoView.classList.add('hidden');
+        actionSelectors.alunoSaldo.textContent = 'R$ 0,00';
+        actionSelectors.alunoExtrato.innerHTML = '<p>Nenhuma transação encontrada.</p>';
+        
+        // Limpar select de professor e esconder view
+        actionSelectors.selectProfessor.value = '';
+        actionSelectors.professorView.classList.add('hidden');
+        actionSelectors.professorExtrato.innerHTML = '<p>Nenhum envio encontrado.</p>';
+        
+        // Limpar formulário de distribuição de moedas
+        forms.distributeCoins.reset();
+        document.getElementById('distribute-professor-id').value = '';
+        
+        // Limpar select de alunos no formulário
+        const alunoSelect = document.getElementById('distribute-aluno-id');
+        alunoSelect.innerHTML = '<option value="">Selecione um aluno</option>';
+    };
+
     const populateActionSelects = async () => {
         await Promise.all([fetchData('alunos'), fetchData('professores')]);
         const populate = (select, items, placeholder) => {
@@ -299,6 +325,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const id = target.value;
         forms.distributeCoins.querySelector('#distribute-professor-id').value = id;
+        
+        // Popular o select de alunos
+        const alunoSelect = document.getElementById('distribute-aluno-id');
+        alunoSelect.innerHTML = '<option value="">Selecione um aluno</option>';
+        state.alunos.forEach(aluno => {
+            alunoSelect.innerHTML += `<option value="${aluno.id}">${aluno.nome}</option>`;
+        });
+        
         const extrato = await apiCall(`${apiUrls.professores}/${id}/extrato`, 'GET');
         renderStatementTable(actionSelectors.professorExtrato, extrato, true);
     };
