@@ -231,4 +231,12 @@ classDiagram
 - **Vantagem** representa os benefícios oferecidos pelas empresas.  
 - **Sistema** é uma classe de controle, responsável por autenticação e envio de notificações.  
 
+## Diagrama de Sequencia do requisito Cadastro de Vantagem
+
+<img width="1007" height="355" alt="image" src="https://github.com/user-attachments/assets/810b0e1b-7c96-4275-acfa-798c49f506b0" />
+
+## Diagrama de Sequencia do requisito Lista de Vantagens do Aluno.
+
+<img width="866" height="355" alt="image" src="https://github.com/user-attachments/assets/24780767-26db-4a98-8604-32bd6b2af94e" />
+
 ---
