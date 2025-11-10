@@ -1,8 +1,10 @@
 package com.moedas.services;
 
 import com.moedas.dto.request.VantagemRequest;
+import com.moedas.entities.Aluno;
 import com.moedas.entities.Empresa;
 import com.moedas.entities.Vantagem;
+import com.moedas.repositories.AlunoRepository;
 import com.moedas.repositories.EmpresaRepository;
 import com.moedas.repositories.VantagemRepository;
 import jakarta.inject.Singleton;
@@ -17,6 +19,7 @@ import java.util.List;
 public class VantagemService {
 
     private final VantagemRepository vantagemRepository;
+    private final AlunoRepository alunoRepository;
     private final EmpresaRepository empresaRepository;
 
     public Vantagem criarVantagem(Long empresaId, VantagemRequest request) {
@@ -55,7 +58,7 @@ public class VantagemService {
 
     // NOVO MÉTODO: Listar vantagens disponíveis para resgate
     public List<Vantagem> listarVantagensDisponiveis() {
-        return vantagemRepository.findByAlunoIdIsNullAndAtivaTrue();
+        return vantagemRepository.findAll();
     }
 
     // NOVO MÉTODO: Resgatar vantagem (associar a um aluno)
@@ -70,7 +73,13 @@ public class VantagemService {
         if (vantagem.getAlunoId() != null) {
             throw new RuntimeException("Vantagem já foi resgatada");
         }
+        Aluno aluno = alunoRepository.findById(alunoId).orElseThrow(() -> new RuntimeException("Nenhum aluno encontrado"));
+        if(aluno.getSaldoMoedas() < vantagem.getCustoMoedas()){
+            throw new RuntimeException("Moedas insuficientes");
+        }
 
+        aluno.setSaldoMoedas(aluno.getSaldoMoedas() - vantagem.getCustoMoedas());
+        alunoRepository.update(aluno);
         vantagem.setAlunoId(alunoId);
         vantagem = vantagemRepository.update(vantagem);
 
