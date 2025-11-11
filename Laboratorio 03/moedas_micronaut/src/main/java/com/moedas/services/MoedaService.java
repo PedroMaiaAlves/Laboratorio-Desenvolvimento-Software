@@ -42,7 +42,6 @@ public class MoedaService {
         professorRepository.update(professor);
         alunoRepository.update(aluno);
 
-        // Registrar transação
         Transacao transacao = Transacao.builder()
                 .professor(professor)
                 .aluno(aluno)

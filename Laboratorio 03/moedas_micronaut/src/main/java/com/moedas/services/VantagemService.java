@@ -3,15 +3,18 @@ package com.moedas.services;
 import com.moedas.dto.request.VantagemRequest;
 import com.moedas.entities.Aluno;
 import com.moedas.entities.Empresa;
+import com.moedas.entities.UsarVantagem;
 import com.moedas.entities.Vantagem;
 import com.moedas.repositories.AlunoRepository;
 import com.moedas.repositories.EmpresaRepository;
+import com.moedas.repositories.UsarVantagemRepository;
 import com.moedas.repositories.VantagemRepository;
 import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Singleton
 @RequiredArgsConstructor
@@ -19,6 +22,7 @@ import java.util.List;
 public class VantagemService {
 
     private final VantagemRepository vantagemRepository;
+    private final UsarVantagemRepository usarVantagemRepository;
     private final AlunoRepository alunoRepository;
     private final EmpresaRepository empresaRepository;
 
@@ -33,7 +37,6 @@ public class VantagemService {
                 .custoMoedas(request.getCustoMoedas())
                 .empresa(empresa)
                 .ativa(true)
-                .alunoId(null) // Inicialmente sem aluno associado
                 .build();
 
         vantagem = vantagemRepository.save(vantagem);
@@ -53,15 +56,19 @@ public class VantagemService {
 
     // NOVO MÉTODO: Listar vantagens por aluno
     public List<Vantagem> listarVantagensPorAluno(Long alunoId) {
-        return vantagemRepository.findByAlunoId(alunoId);
+        List<UsarVantagem> listaUsarVantagem = usarVantagemRepository.findByAlunoId(alunoId);
+
+        List<Vantagem> listaVantagens = listaUsarVantagem.stream()
+                        .map(UsarVantagem::getVantagem)
+                        .collect(Collectors.toList());
+
+        return listaUsarVantagem.stream()
+                .map(UsarVantagem::getVantagem)
+                .distinct()
+                .collect(Collectors.toList());
     }
 
-    // NOVO MÉTODO: Listar vantagens disponíveis para resgate
-    public List<Vantagem> listarVantagensDisponiveis() {
-        return vantagemRepository.findAll();
-    }
-
-    // NOVO MÉTODO: Resgatar vantagem (associar a um aluno)
+ //    NOVO MÉTODO: Resgatar vantagem (associar a um aluno)
     public Vantagem resgatarVantagem(Long vantagemId, Long alunoId) {
         Vantagem vantagem = vantagemRepository.findById(vantagemId)
                 .orElseThrow(() -> new RuntimeException("Vantagem não encontrada"));
@@ -70,18 +77,20 @@ public class VantagemService {
             throw new RuntimeException("Vantagem não está ativa");
         }
 
-        if (vantagem.getAlunoId() != null) {
-            throw new RuntimeException("Vantagem já foi resgatada");
-        }
         Aluno aluno = alunoRepository.findById(alunoId).orElseThrow(() -> new RuntimeException("Nenhum aluno encontrado"));
+
         if(aluno.getSaldoMoedas() < vantagem.getCustoMoedas()){
             throw new RuntimeException("Moedas insuficientes");
         }
 
+        UsarVantagem usarVantagem = UsarVantagem.builder()
+                .vantagem(vantagem)
+                .aluno(aluno)
+                .build();
+
         aluno.setSaldoMoedas(aluno.getSaldoMoedas() - vantagem.getCustoMoedas());
         alunoRepository.update(aluno);
-        vantagem.setAlunoId(alunoId);
-        vantagem = vantagemRepository.update(vantagem);
+        usarVantagem = usarVantagemRepository.save(usarVantagem);
 
         log.info("Vantagem {} resgatada pelo aluno {}", vantagem.getNome(), alunoId);
 

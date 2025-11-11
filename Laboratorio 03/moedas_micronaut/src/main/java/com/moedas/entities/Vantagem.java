@@ -32,8 +32,4 @@ public class Vantagem {
     @ManyToOne
     @JoinColumn(name = "empresa_id")
     private Empresa empresa;
-
-    // Novo campo: ID do aluno que resgatou a vantagem
-    @Column(name = "aluno_id")
-    private Long alunoId;
 }

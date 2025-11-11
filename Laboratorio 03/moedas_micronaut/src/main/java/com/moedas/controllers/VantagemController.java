@@ -1,6 +1,7 @@
 package com.moedas.controllers;
 
 import com.moedas.dto.request.VantagemRequest;
+import com.moedas.repositories.UsarVantagemRepository;
 import com.moedas.services.VantagemService;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
@@ -33,18 +34,6 @@ public class VantagemController {
     public HttpResponse<?> listarVantagensPorAluno(@PathVariable Long alunoId) {
         try {
             List<?> vantagens = vantagemService.listarVantagensPorAluno(alunoId);
-            return HttpResponse.ok(vantagens);
-        } catch (Exception e) {
-            return HttpResponse.serverError();
-        }
-    }
-
-    // NOVO ENDPOINT: Listar vantagens disponíveis
-    @Get("/disponiveis")
-    @Secured(SecurityRule.IS_ANONYMOUS)
-    public HttpResponse<?> listarVantagensDisponiveis() {
-        try {
-            List<?> vantagens = vantagemService.listarVantagensDisponiveis();
             return HttpResponse.ok(vantagens);
         } catch (Exception e) {
             return HttpResponse.serverError();
