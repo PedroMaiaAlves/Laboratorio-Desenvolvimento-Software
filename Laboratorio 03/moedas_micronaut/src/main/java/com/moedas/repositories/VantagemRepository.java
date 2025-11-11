@@ -15,9 +15,4 @@ public interface VantagemRepository extends JpaRepository<Vantagem, Long> {
 
     // Novo método: buscar vantagens por aluno
     List<Vantagem> findByAlunoId(Long alunoId);
-
-    // Método para buscar vantagens disponíveis (sem aluno associado)
-    List<Vantagem> findByAlunoIdIsNullAndAtivaTrue();
-
-    List<Vantagem> findByEmpresaIdAndAtivaTrue(Long id);
 }

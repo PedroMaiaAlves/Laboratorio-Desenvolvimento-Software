@@ -22,8 +22,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class EmpresaController {
 
-    private final EmpresaRepository empresaRepository;
-    private final VantagemRepository vantagemRepository;
     private final EmpresaService empresaService;
 
     @Post("/create")
@@ -71,41 +69,5 @@ public class EmpresaController {
     public HttpResponse<Void> deleteEmpresa(@PathVariable Long id){
             empresaService.deletaEmpresa(id);
         return HttpResponse.noContent();
-    }
-
-    @Post("/{id}/vantagens")
-    @Secured("EMPRESA")
-    public Vantagem criarVantagem(@PathVariable Long id, @Body VantagemRequest request) {
-        Empresa empresa = empresaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Empresa não encontrada"));
-
-        Vantagem vantagem = Vantagem.builder()
-                .nome(request.getNome())
-                .descricao(request.getDescricao())
-                .fotoUrl(request.getFotoUrl())
-                .custoMoedas(request.getCustoMoedas())
-                .empresa(empresa)
-                .ativa(true)
-                .build();
-
-        return vantagemRepository.save(vantagem);
-    }
-
-    @Get("/{id}/vantagens")
-    @Secured("EMPRESA")
-    public List<Vantagem> getVantagens(@PathVariable Long id) {
-        return vantagemRepository.findByEmpresaIdAndAtivaTrue(id);
-    }
-
-    @Put("/vantagens/{vantagemId}/toggle")
-    @Secured("EMPRESA")
-    public Map<String, String> toggleVantagem(@PathVariable Long vantagemId) {
-        Vantagem vantagem = vantagemRepository.findById(vantagemId)
-                .orElseThrow(() -> new RuntimeException("Vantagem não encontrada"));
-
-        vantagem.setAtiva(!vantagem.isAtiva());
-        vantagemRepository.update(vantagem);
-
-        return Map.of("message", "Vantagem " + (vantagem.isAtiva() ? "ativada" : "desativada") + " com sucesso");
     }
 }

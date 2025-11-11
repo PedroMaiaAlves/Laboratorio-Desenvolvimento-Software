@@ -1,19 +1,11 @@
 package com.moedas.controllers;
 
 import com.moedas.dto.request.CreateAlunoRequestDTO;
-import com.moedas.dto.request.ResgateRequest;
 import com.moedas.dto.request.UpdateAlunoRequestDTO;
 import com.moedas.dto.response.CreateAlunoResponseDTO;
-import com.moedas.entities.Aluno;
-import com.moedas.entities.Resgate;
 import com.moedas.entities.Transacao;
-import com.moedas.entities.Vantagem;
-import com.moedas.repositories.AlunoRepository;
-import com.moedas.repositories.ResgateRepository;
 import com.moedas.repositories.TransacaoRepository;
-import com.moedas.repositories.VantagemRepository;
 import com.moedas.services.MoedaService;
-import com.moedas.services.ResgateService;
 import com.moedas.services.aluno.AlunoService;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.*;
@@ -28,13 +20,8 @@ import java.util.Map;
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @RequiredArgsConstructor
 public class AlunoController {
-
-    private final AlunoRepository alunoRepository;
-    private final VantagemRepository vantagemRepository;
     private final TransacaoRepository transacaoRepository;
-    private final ResgateRepository resgateRepository;
     private final MoedaService moedaService;
-    private final ResgateService resgateService;
     private final AlunoService alunoService;
 
     @Post("/cadastrar")
@@ -93,31 +80,13 @@ public class AlunoController {
         }
     }
 
-    @Get("/vantagens")
-    @Secured(SecurityRule.IS_ANONYMOUS)
-    public List<Vantagem> getVantagens() {
-        return vantagemRepository.findByAtivaTrue();
-    }
-
-    @Post("/{id}/resgatar")
-    @Secured(SecurityRule.IS_ANONYMOUS)
-    public Resgate resgatarVantagem(@PathVariable Long id, @Body ResgateRequest request) {
-        return resgateService.resgatarVantagem(id, request);
-    }
-
-    @Get("/{id}/extrato-transacoes")
+    @Get("/{id}/extrato-transacoes") // 324 app.js
     @Secured(SecurityRule.IS_ANONYMOUS)
     public List<Transacao> getExtratoTransacoes(@PathVariable Long id) {
         return transacaoRepository.findByAlunoIdOrderByDataHoraDesc(id);
     }
 
-    @Get("/{id}/extrato-resgates")
-    @Secured(SecurityRule.IS_ANONYMOUS)
-    public List<Resgate> getExtratoResgates(@PathVariable Long id) {
-        return resgateRepository.findByAlunoIdOrderByDataHoraDesc(id);
-    }
-
-    @Get("/{id}/saldo")
+    @Get("/{id}/saldo") // app.js 321
     @Secured(SecurityRule.IS_ANONYMOUS)
     public Map<String, Double> getSaldo(@PathVariable Long id) {
         double saldo = moedaService.consultarSaldoAluno(id);

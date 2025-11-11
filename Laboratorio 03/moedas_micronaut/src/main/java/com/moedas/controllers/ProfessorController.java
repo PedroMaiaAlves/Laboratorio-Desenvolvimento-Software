@@ -27,7 +27,6 @@ import java.util.Map;
 public class ProfessorController {
 
     private final MoedaService moedaService;
-    private final ProfessorRepository professorRepository;
     private final TransacaoRepository transacaoRepository;
     private final ProfessorService professorService;
 
@@ -63,29 +62,15 @@ public class ProfessorController {
         professorService.delete(id);
     }
 
-    @Post("/{id}/distribuir_moedas")
+    @Post("/{id}/distribuir_moedas") // app.js 360
     @Secured(SecurityRule.IS_ANONYMOUS)
     public Transacao distribuirMoedas(@PathVariable Long id, @Body TransacaoRequest request) {
         return moedaService.distribuirMoedas(id, request);
     }
 
-    @Get("/{id}/extrato")
+    @Get("/{id}/extrato") // app.js 342 e 399
     @Secured(SecurityRule.IS_ANONYMOUS)
     public List<Transacao> getExtrato(@PathVariable Long id) {
         return transacaoRepository.findByProfessorIdOrderByDataHoraDesc(id);
-    }
-
-    @Get("/{id}/saldo")
-    @Secured(SecurityRule.IS_ANONYMOUS)
-    public Map<String, Double> getSaldo(@PathVariable Long id) {
-        double saldo = moedaService.consultarSaldoProfessor(id);
-        return Map.of("saldo", saldo);
-    }
-
-    @Get("/{id}")
-    @Secured(SecurityRule.IS_ANONYMOUS)
-    public Professor getProfessor(@PathVariable Long id) {
-        return professorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Professor não encontrado"));
     }
 }

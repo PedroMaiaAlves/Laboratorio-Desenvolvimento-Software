@@ -88,23 +88,6 @@ public class VantagemService {
         return vantagem;
     }
 
-    public Vantagem toggleVantagem(Long vantagemId, Long empresaId) {
-        Vantagem vantagem = vantagemRepository.findById(vantagemId)
-                .orElseThrow(() -> new RuntimeException("Vantagem não encontrada"));
-
-        if (!vantagem.getEmpresa().getId().equals(empresaId)) {
-            throw new RuntimeException("Vantagem não pertence a esta empresa");
-        }
-
-        vantagem.setAtiva(!vantagem.isAtiva());
-        vantagemRepository.update(vantagem);
-
-        log.info("Vantagem {} {} pela empresa {}",
-                vantagem.getNome(), vantagem.isAtiva() ? "ativada" : "desativada", empresaId);
-
-        return vantagem;
-    }
-
     public void deletarVantagem(Long vantagemId, Long empresaId) {
         Vantagem vantagem = vantagemRepository.findById(vantagemId)
                 .orElseThrow(() -> new RuntimeException("Vantagem não encontrada"));

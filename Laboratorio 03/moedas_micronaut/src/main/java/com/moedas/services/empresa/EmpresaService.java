@@ -70,19 +70,6 @@ public class EmpresaService {
                         .razaoSocial(empresa.getRazaoSocial()).build()).toList();
     }
 
-    public CreateEmpresaResponseDTO listaById(long id) {
-        @NonNull Optional<Empresa> empresa = empresaRepository.findById(id);
-
-        return createEmpresaDTO(empresa.orElse(null));
-    }
-
-    public void deleteEmpresa(Long id) {
-        if (!empresaRepository.existsById(id)) {
-            throw new HttpStatusException(HttpStatus.NOT_FOUND, "Empresa com o id inexistente");
-        }
-        empresaRepository.deleteById(id);
-    }
-
     private Empresa createEmpresaEntity(CreateEmpresaRequestDTO createEmpresaRequestDTO) {
         return Empresa.builder()
                 .email(createEmpresaRequestDTO.getEmail())
