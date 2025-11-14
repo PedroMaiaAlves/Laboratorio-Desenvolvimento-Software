@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="scripts/email-service.js"></script>
+    <script src="scripts/auth.js"></script>
 </head>
 <body>
     
@@ -76,7 +77,7 @@
             <!-- Ações do Professor -->
             <div class="action-card">
                 <h2>Ações do Professor</h2>
-                <div class="form-group">
+                <div class="form-group" id="select-professor-group">
                     <label for="select-professor-acao">Selecione um Professor</label>
                     <select id="select-professor-acao"></select>
                 </div>
@@ -296,6 +297,87 @@
     <!-- Container para Toasts -->
     <div id="toast-container"></div>
 
+    <script>
+        // Verificar autenticação e permissões ao carregar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            // Aguardar carregamento do auth.js
+            if (typeof AuthService === 'undefined') {
+                console.error('AuthService não encontrado. Certifique-se de que scripts/auth.js está carregado.');
+                return;
+            }
+            const role = AuthService.getRole();
+            
+            // Se não estiver autenticado, redirecionar para login
+            if (!role) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Ajustar navegação baseado na role
+            if (role === 'ALUNO') {
+                // Aluno só pode acessar vantagens
+                window.location.href = 'vantagens.html';
+                return;
+            } else if (role === 'EMPRESA') {
+                // Empresa só pode acessar vantagens (para gerenciar)
+                window.location.href = 'vantagens.html';
+                return;
+            } else if (role === 'PROFESSOR') {
+                // Professor vê apenas a tela de Ações
+                const alunosTab = document.querySelector('[data-tab="alunos"]');
+                const empresasTab = document.querySelector('[data-tab="empresas"]');
+                const professoresTab = document.querySelector('[data-tab="professores"]');
+                const acoesTab = document.querySelector('[data-tab="acoes"]');
+                const addBtn = document.getElementById('add-btn');
+                const mainTitle = document.getElementById('main-title');
+
+                // Ocultar abas de gerenciamento
+                if (alunosTab) alunosTab.style.display = 'none';
+                if (empresasTab) empresasTab.style.display = 'none';
+                if (professoresTab) professoresTab.style.display = 'none';
+                
+                // Mostrar e ativar aba de Ações
+                if (acoesTab) {
+                    acoesTab.style.display = 'block';
+                    acoesTab.classList.add('active');
+                    // Remover active de outras abas
+                    document.querySelectorAll('.tab-btn').forEach(tab => {
+                        if (tab !== acoesTab) tab.classList.remove('active');
+                    });
+                }
+
+                // Ocultar botão de adicionar
+                if (addBtn) addBtn.style.display = 'none';
+
+                // Ajustar título
+                if (mainTitle) {
+                    mainTitle.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Ações';
+                }
+
+                // Ocultar seções de alunos, empresas e professores
+                // O app.js já vai inicializar na view de ações automaticamente
+            } else {
+                // Role desconhecida, redirecionar para login
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Adicionar botão de logout no header
+            const headerContent = document.querySelector('.header-content');
+            if (headerContent) {
+                const userInfo = AuthService.getUserInfo();
+                const logoutBtn = document.createElement('button');
+                logoutBtn.className = 'btn btn-secondary';
+                logoutBtn.style.marginLeft = 'auto';
+                logoutBtn.innerHTML = `<span>${userInfo?.nome || 'Usuário'} - Sair</span>`;
+                logoutBtn.addEventListener('click', () => {
+                    AuthService.logout();
+                    window.location.href = 'login.html';
+                });
+                headerContent.appendChild(logoutBtn);
+            }
+        });
+    </script>
     <script src="app.js"></script>
     <script src="scripts/input-mask.js"></script>
 </body>

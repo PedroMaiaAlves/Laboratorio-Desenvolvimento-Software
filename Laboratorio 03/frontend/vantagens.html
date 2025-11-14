@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="scripts/auth.js"></script>
 </head>
 <body>
 
@@ -107,5 +108,61 @@
     <div id="toast-container"></div>
 
     <script src="scripts/vantagens.js"></script>
+    <script>
+        // Verificar autenticação ao carregar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            const role = AuthService.getRole();
+            
+            // Se não estiver autenticado, redirecionar para login
+            if (!role) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Ajustar exibição baseada na role
+            const cadastroSection = document.getElementById('cadastro-vantagem-section');
+            const listagemSection = document.getElementById('listagem-vantagens-section');
+            const gerenciamentoLink = document.querySelector('a[href="index.html"]');
+
+            if (role === 'EMPRESA') {
+                // Empresa pode cadastrar e gerenciar vantagens
+                if (cadastroSection) cadastroSection.style.display = 'block';
+                if (listagemSection) listagemSection.style.display = 'block';
+                // Ocultar link de gerenciamento para empresa
+                if (gerenciamentoLink) gerenciamentoLink.style.display = 'none';
+            } else if (role === 'ALUNO') {
+                // Aluno só pode visualizar e resgatar vantagens
+                if (cadastroSection) cadastroSection.style.display = 'none';
+                if (listagemSection) listagemSection.style.display = 'block';
+                // Ocultar link de gerenciamento para aluno
+                if (gerenciamentoLink) gerenciamentoLink.style.display = 'none';
+            } else if (role === 'PROFESSOR') {
+                // Professor pode visualizar vantagens e acessar gerenciamento
+                if (cadastroSection) cadastroSection.style.display = 'none';
+                if (listagemSection) listagemSection.style.display = 'block';
+                // Mostrar link de gerenciamento para professor
+                if (gerenciamentoLink) gerenciamentoLink.style.display = 'block';
+            }
+
+            // Adicionar botão de logout no header
+            const header = document.querySelector('header');
+            if (header) {
+                const userInfo = AuthService.getUserInfo();
+                const logoutBtn = document.createElement('button');
+                logoutBtn.className = 'btn btn-secondary';
+                logoutBtn.style.marginLeft = 'auto';
+                logoutBtn.style.marginTop = '1rem';
+                logoutBtn.innerHTML = `<span>${userInfo?.nome || 'Usuário'} - Sair</span>`;
+                logoutBtn.addEventListener('click', () => {
+                    AuthService.logout();
+                    window.location.href = 'login.html';
+                });
+                const navWrapper = document.querySelector('.vantagens-nav-wrapper');
+                if (navWrapper) {
+                    navWrapper.appendChild(logoutBtn);
+                }
+            }
+        });
+    </script>
 </body>
 </html>

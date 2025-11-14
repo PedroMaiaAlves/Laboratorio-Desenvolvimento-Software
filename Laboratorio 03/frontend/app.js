@@ -1,4 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Verificar autenticação
+    if (typeof AuthService !== 'undefined') {
+        const role = AuthService.getRole();
+        if (!role) {
+            window.location.href = 'login.html';
+            return;
+        }
+    }
+
     const apiUrls = {
         alunos: 'http://localhost:8080/alunos',
         empresas: 'http://localhost:8080/empresas',
@@ -75,6 +84,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 method,
                 headers: { 'Content-Type': 'application/json' },
             };
+            
+            // Adicionar token de autenticação se disponível
+            if (typeof AuthService !== 'undefined' && AuthService.isAuthenticated()) {
+                const auth = AuthService.getAuth();
+                if (auth && auth.token) {
+                    options.headers['Authorization'] = `${auth.tipo} ${auth.token}`;
+                }
+            }
+            
             if (body) options.body = JSON.stringify(body);
 
             const response = await fetch(url, options);
@@ -135,6 +153,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- NAVEGAÇÃO E VISIBILIDADE ---
     const switchView = async (view) => {
+        // Verificar permissões para acessar a aba de ações
+        if (view === 'acoes') {
+            const role = typeof AuthService !== 'undefined' ? AuthService.getRole() : null;
+            if (role !== 'PROFESSOR') {
+                showToast('Apenas professores podem acessar esta seção.', 'error');
+                window.location.href = 'vantagens.html';
+                return;
+            }
+        }
+        
         // Limpar campos da aba de ações ao sair dela
         if (state.currentView === 'acoes' && view !== 'acoes') {
             clearActionFields();
@@ -161,6 +189,37 @@ document.addEventListener('DOMContentLoaded', () => {
             renderAll();
         } else {
             await populateActionSelects();
+            
+            // Se for professor logado, inicializar automaticamente
+            const role = typeof AuthService !== 'undefined' ? AuthService.getRole() : null;
+            if (role === 'PROFESSOR') {
+                const userInfo = typeof AuthService !== 'undefined' ? AuthService.getUserInfo() : null;
+                if (userInfo && userInfo.userId) {
+                    // Ocultar select de professor
+                    const selectProfessorGroup = document.getElementById('select-professor-group');
+                    if (selectProfessorGroup) {
+                        selectProfessorGroup.style.display = 'none';
+                    }
+                    
+                    // Preencher automaticamente com o professor logado
+                    const professorId = userInfo.userId;
+                    forms.distributeCoins.querySelector('#distribute-professor-id').value = professorId;
+                    
+                    // Popular o select de alunos
+                    const alunoSelect = document.getElementById('distribute-aluno-id');
+                    alunoSelect.innerHTML = '<option value="">Selecione um aluno</option>';
+                    state.alunos.forEach(aluno => {
+                        alunoSelect.innerHTML += `<option value="${aluno.id}">${aluno.nome}</option>`;
+                    });
+                    
+                    // Mostrar a view de ações do professor
+                    actionSelectors.professorView.classList.remove('hidden');
+                    
+                    // Carregar extrato do professor
+                    const extrato = await apiCall(`${apiUrls.professores}/${professorId}/extrato`, 'GET');
+                    renderStatementTable(actionSelectors.professorExtrato, extrato, true);
+                }
+            }
         }
     };
 
@@ -310,7 +369,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         };
         populate(actionSelectors.selectAluno, state.alunos, 'Selecione um aluno');
-        populate(actionSelectors.selectProfessor, state.professores, 'Selecione um professor');
+        
+        // Só popular select de professor se não for professor logado
+        const role = typeof AuthService !== 'undefined' ? AuthService.getRole() : null;
+        if (role !== 'PROFESSOR') {
+            populate(actionSelectors.selectProfessor, state.professores, 'Selecione um professor');
+        }
     };
 
     const handleAlunoActionSelect = async ({ target }) => {
@@ -318,8 +382,45 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!target.value) return;
 
         const id = target.value;
-        const saldo = await apiCall(`${apiUrls.alunos}/${id}/saldo`, 'GET');
-        actionSelectors.alunoSaldo.textContent = (saldo && saldo.saldo !== undefined) ? `R$ ${saldo.saldo.toFixed(2)}` : 'Erro ao buscar saldo.';
+        
+        try {
+            const saldoResponse = await apiCall(`${apiUrls.alunos}/${id}/saldo`, 'GET');
+            
+            // Tratar diferentes formatos de resposta
+            let saldoValue = null;
+            
+            if (saldoResponse !== null && saldoResponse !== undefined) {
+                // Se for um número direto
+                if (typeof saldoResponse === 'number') {
+                    saldoValue = saldoResponse;
+                }
+                // Se for um objeto com propriedade saldo
+                else if (typeof saldoResponse === 'object' && saldoResponse.saldo !== undefined) {
+                    saldoValue = saldoResponse.saldo;
+                }
+                // Se for um objeto com outra propriedade (ex: valor, quantidade, etc)
+                else if (typeof saldoResponse === 'object') {
+                    // Tentar encontrar qualquer propriedade numérica
+                    const numericKeys = Object.keys(saldoResponse).filter(key => 
+                        typeof saldoResponse[key] === 'number'
+                    );
+                    if (numericKeys.length > 0) {
+                        saldoValue = saldoResponse[numericKeys[0]];
+                    }
+                }
+            }
+            
+            // Exibir o saldo
+            if (saldoValue !== null && saldoValue !== undefined) {
+                actionSelectors.alunoSaldo.textContent = `R$ ${parseFloat(saldoValue).toFixed(2)}`;
+            } else {
+                actionSelectors.alunoSaldo.textContent = 'R$ 0,00';
+                console.warn('Formato de resposta do saldo não reconhecido:', saldoResponse);
+            }
+        } catch (error) {
+            console.error('Erro ao buscar saldo:', error);
+            actionSelectors.alunoSaldo.textContent = 'Erro ao buscar saldo.';
+        }
 
         const extrato = await apiCall(`${apiUrls.alunos}/${id}/extrato-transacoes`, 'GET');
         renderStatementTable(actionSelectors.alunoExtrato, extrato, false);
@@ -345,11 +446,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const handleDistributeCoins = async (e) => {
         e.preventDefault();
-        const id = forms.distributeCoins.querySelector('#distribute-professor-id').value;
+        
+        // Obter ID do professor (do campo hidden ou do usuário logado)
+        let professorId = forms.distributeCoins.querySelector('#distribute-professor-id').value;
+        
+        // Se não tiver ID no campo, tentar pegar do usuário logado
+        if (!professorId) {
+            const role = typeof AuthService !== 'undefined' ? AuthService.getRole() : null;
+            const userInfo = typeof AuthService !== 'undefined' ? AuthService.getUserInfo() : null;
+            if (role === 'PROFESSOR' && userInfo && userInfo.userId) {
+                professorId = userInfo.userId;
+            }
+        }
+        
+        if (!professorId) {
+            showToast('Erro: Professor não identificado', 'error');
+            return;
+        }
+        
         const { alunoId, quantidadeMoedas, motivo } = Object.fromEntries(new FormData(forms.distributeCoins));
         
         // Buscar informações do professor e do aluno
-        const professor = state.professores.find(p => p.id == id);
+        // Se for professor logado, tentar usar informações do AuthService, mas buscar email do state se necessário
+        let professor;
+        const role = typeof AuthService !== 'undefined' ? AuthService.getRole() : null;
+        const userInfo = typeof AuthService !== 'undefined' ? AuthService.getUserInfo() : null;
+        
+        if (role === 'PROFESSOR' && userInfo) {
+            // Buscar professor completo no state para ter o email
+            const professorFromState = state.professores.find(p => p.id == professorId);
+            if (professorFromState) {
+                professor = professorFromState;
+            } else {
+                // Se não encontrar no state, usar informações do AuthService
+                professor = {
+                    id: userInfo.userId,
+                    nome: userInfo.nome,
+                    email: userInfo.email || ''
+                };
+            }
+        } else {
+            // Buscar no state
+            professor = state.professores.find(p => p.id == professorId);
+        }
+        
         const aluno = state.alunos.find(a => a.id == alunoId);
         
         if (!professor || !aluno) {
@@ -357,7 +497,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const result = await apiCall(`${apiUrls.professores}/${id}/distribuir_moedas`, 'POST', { 
+        const result = await apiCall(`${apiUrls.professores}/${professorId}/distribuir_moedas`, 'POST', { 
             alunoId: parseInt(alunoId), 
             quantidadeMoedas: parseFloat(quantidadeMoedas), 
             motivo 
@@ -395,8 +535,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             forms.distributeCoins.reset();
-            document.getElementById('distribute-professor-id').value = id;
-            const extrato = await apiCall(`${apiUrls.professores}/${id}/extrato`, 'GET');
+            // Manter o ID do professor no campo hidden
+            document.getElementById('distribute-professor-id').value = professorId;
+            // Recarregar select de alunos
+            const alunoSelect = document.getElementById('distribute-aluno-id');
+            alunoSelect.innerHTML = '<option value="">Selecione um aluno</option>';
+            state.alunos.forEach(aluno => {
+                alunoSelect.innerHTML += `<option value="${aluno.id}">${aluno.nome}</option>`;
+            });
+            const extrato = await apiCall(`${apiUrls.professores}/${professorId}/extrato`, 'GET');
             renderStatementTable(actionSelectors.professorExtrato, extrato, true);
         }
     };
@@ -462,7 +609,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        await switchView('alunos');
+        // Verificar se é professor para iniciar na view de ações
+        const role = typeof AuthService !== 'undefined' ? AuthService.getRole() : null;
+        const initialView = role === 'PROFESSOR' ? 'acoes' : 'alunos';
+        await switchView(initialView);
+        
+        // Tornar switchView acessível globalmente para uso externo
+        window.switchView = switchView;
     };
 
     const showToast = (message, type = 'success') => {

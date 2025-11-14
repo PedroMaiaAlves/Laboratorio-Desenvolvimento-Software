@@ -2,6 +2,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- CONFIGURAÇÕES ---
     const API_BASE_URL = 'http://localhost:8080';
+    
+    // Carregar auth.js se disponível
+    if (typeof AuthService === 'undefined') {
+        const authScript = document.createElement('script');
+        authScript.src = 'scripts/auth.js';
+        document.head.appendChild(authScript);
+    }
 
     // --- SELETORES ---
     const vantagemForm = document.getElementById('vantagem-form');
@@ -76,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const carregarVantagens = async () => {
-        const vantagens = await apiCall(`${API_BASE_URL}/vantagem/disponiveis`, 'GET');
+        const vantagens = await apiCall(`${API_BASE_URL}/vantagem/ativas`, 'GET');
         if (vantagens && vantagensList) {
             vantagensList.innerHTML = '';
             if (vantagens.length === 0) {
@@ -130,7 +137,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = Object.fromEntries(formData.entries());
         
         data.custoMoedas = parseFloat(data.custoMoedas);
-        const idEmpresa = data.empresaId;
+        
+        // Verificar se é empresa logada
+        const role = typeof AuthService !== 'undefined' ? AuthService.getRole() : null;
+        const userInfo = typeof AuthService !== 'undefined' ? AuthService.getUserInfo() : null;
+        
+        let idEmpresa = data.empresaId;
+        
+        // Se for empresa logada, usar o ID da empresa logada
+        if (role === 'EMPRESA' && userInfo && userInfo.userId) {
+            idEmpresa = userInfo.userId;
+        }
 
         if (!idEmpresa) {
             showToast('Por favor, selecione uma empresa.', 'error');
@@ -150,8 +167,10 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast('Vantagem cadastrada com sucesso!', 'success');
             vantagemForm.reset();
             carregarVantagens();
-            // Recarrega as empresas para limpar a seleção
-            carregarEmpresas();
+            // Recarrega as empresas para limpar a seleção (se não for empresa logada)
+            if (role !== 'EMPRESA') {
+                carregarEmpresas();
+            }
         }
     };
 
@@ -163,7 +182,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if (resgateVantagemNome) resgateVantagemNome.textContent = nome;
         if (resgateVantagemCusto) resgateVantagemCusto.textContent = custo;
         
-        await carregarAlunosParaSelecao();
+        // Verificar se é aluno logado
+        const role = typeof AuthService !== 'undefined' ? AuthService.getRole() : null;
+        const userInfo = typeof AuthService !== 'undefined' ? AuthService.getUserInfo() : null;
+        
+        if (role === 'ALUNO' && userInfo && userInfo.userId) {
+            // Se for aluno, usar o ID do aluno logado
+            alunoSelect.innerHTML = `<option value="${userInfo.userId}">${userInfo.nome || 'Você'}</option>`;
+            alunoSelect.value = userInfo.userId;
+            alunoSelect.disabled = true;
+        } else {
+            // Se for professor ou outro, carregar lista de alunos
+            alunoSelect.disabled = false;
+            await carregarAlunosParaSelecao();
+        }
+        
         openModal(resgateModal);
     };
 
@@ -193,7 +226,23 @@ document.addEventListener('DOMContentLoaded', () => {
         carregarVantagens();
 
         if (vantagemForm) {
-            carregarEmpresas();
+            // Verificar se é empresa logada
+            const role = typeof AuthService !== 'undefined' ? AuthService.getRole() : null;
+            const userInfo = typeof AuthService !== 'undefined' ? AuthService.getUserInfo() : null;
+            
+            if (role === 'EMPRESA' && userInfo && userInfo.userId) {
+                // Se for empresa logada, preencher automaticamente e ocultar o select
+                const empresaSelect = document.getElementById('vantagem-empresa-select');
+                if (empresaSelect) {
+                    empresaSelect.innerHTML = `<option value="${userInfo.userId}">${userInfo.nome || 'Sua Empresa'}</option>`;
+                    empresaSelect.value = userInfo.userId;
+                    empresaSelect.disabled = true;
+                }
+            } else {
+                // Se não for empresa logada, carregar lista de empresas
+                carregarEmpresas();
+            }
+            
             vantagemForm.addEventListener('submit', handleCadastroVantagem);
         }
 
