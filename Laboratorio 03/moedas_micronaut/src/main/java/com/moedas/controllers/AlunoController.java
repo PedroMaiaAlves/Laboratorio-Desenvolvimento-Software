@@ -3,9 +3,10 @@ package com.moedas.controllers;
 import com.moedas.dto.request.CreateAlunoRequestDTO;
 import com.moedas.dto.request.UpdateAlunoRequestDTO;
 import com.moedas.dto.response.CreateAlunoResponseDTO;
+import com.moedas.entities.Aluno;
 import com.moedas.entities.Transacao;
+import com.moedas.repositories.AlunoRepository;
 import com.moedas.repositories.TransacaoRepository;
-import com.moedas.services.MoedaService;
 import com.moedas.services.aluno.AlunoService;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.*;
@@ -14,14 +15,13 @@ import io.micronaut.security.rules.SecurityRule;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
-import java.util.Map;
 
 @Controller("/alunos")
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @RequiredArgsConstructor
 public class AlunoController {
     private final TransacaoRepository transacaoRepository;
-    private final MoedaService moedaService;
+    private final AlunoRepository alunoRepository;
     private final AlunoService alunoService;
 
     @Post("/cadastrar")
@@ -86,10 +86,10 @@ public class AlunoController {
         return transacaoRepository.findByAlunoIdOrderByDataHoraDesc(id);
     }
 
-    @Get("/{id}/saldo") // app.js 321
+    @Get("/{id}/saldo")
     @Secured(SecurityRule.IS_ANONYMOUS)
-    public Map<String, Double> getSaldo(@PathVariable Long id) {
-        double saldo = moedaService.consultarSaldoAluno(id);
-        return Map.of("saldo", saldo);
+    public Double getSaldo(@PathVariable Long id) {
+        Aluno aluno = alunoRepository.findById(id).orElseThrow(() -> new RuntimeException("Error"));
+        return aluno.getSaldoMoedas();
     }
 }

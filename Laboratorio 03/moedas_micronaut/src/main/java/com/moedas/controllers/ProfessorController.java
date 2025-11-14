@@ -4,18 +4,13 @@ import com.moedas.dto.request.CreateProfessorRequestDTO;
 import com.moedas.dto.request.TransacaoRequest;
 import com.moedas.dto.request.UpdateProfessorRequestDTO;
 import com.moedas.dto.response.ProfessorResponseDTO;
-import com.moedas.entities.Professor;
 import com.moedas.entities.Transacao;
-import com.moedas.repositories.ProfessorRepository;
 import com.moedas.repositories.TransacaoRepository;
-import com.moedas.services.MoedaService;
 import com.moedas.services.ProfessorService;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import io.micronaut.serde.annotation.Serdeable;
-import jakarta.validation.Valid;
 import lombok.*;
 
 import java.util.List;
@@ -26,7 +21,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ProfessorController {
 
-    private final MoedaService moedaService;
     private final TransacaoRepository transacaoRepository;
     private final ProfessorService professorService;
 
@@ -65,12 +59,19 @@ public class ProfessorController {
     @Post("/{id}/distribuir_moedas") // app.js 360
     @Secured(SecurityRule.IS_ANONYMOUS)
     public Transacao distribuirMoedas(@PathVariable Long id, @Body TransacaoRequest request) {
-        return moedaService.distribuirMoedas(id, request);
+        return professorService.distribuirMoedas(id, request);
     }
 
     @Get("/{id}/extrato") // app.js 342 e 399
     @Secured(SecurityRule.IS_ANONYMOUS)
     public List<Transacao> getExtrato(@PathVariable Long id) {
         return transacaoRepository.findByProfessorIdOrderByDataHoraDesc(id);
+    }
+
+    @Post("/adicionar-moedas-semestrais")
+    @Secured(SecurityRule.IS_ANONYMOUS)
+    public Map<String, String> adicionarMoedasSemestrais() {
+        professorService.adicionarMoedasSemestrais();
+        return Map.of("message", "Moedas semestrais adicionadas a todos os professores");
     }
 }
