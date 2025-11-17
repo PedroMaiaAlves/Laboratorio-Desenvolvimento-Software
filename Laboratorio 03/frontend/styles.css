@@ -630,6 +630,26 @@ h1 {
     background-color: var(--danger-color);
 }
 
+.toast.toast-insufficient-funds {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 1.25rem 1.5rem;
+    border-left: 4px solid #fbbf24;
+    box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+}
+
+.toast.toast-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 1rem 1.5rem;
+    border-left: 4px solid #fbbf24;
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.25);
+}
+
 @keyframes slideIn {
     to {
         opacity: 1;

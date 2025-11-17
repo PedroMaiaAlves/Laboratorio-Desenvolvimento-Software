@@ -2,6 +2,7 @@
 const EMAILJS_CONFIG = {
     SERVICE_ID: 'service_cjljvsm',          // EmailJS Service ID
     TEMPLATE_ID_COIN_TRANSFER: 'template_wc0x76f', // Template ID for coin transfers
+    TEMPLATE_ID_VANTAGEM_RESGATE: 'template_490zcob', // Template ID for advantage redemption
     PUBLIC_KEY: 'imeF22271UN2bcGWD'         // EmailJS Public Key
 };
 
@@ -93,6 +94,139 @@ class EmailService {
             return { success: true };
         } catch (error) {
             console.error('Error in coin transfer notification:', error);
+            return { success: false, error };
+        }
+    }
+
+    static async sendVantagemResgateEmail(data) {
+        const { 
+            alunoNome, 
+            alunoEmail, 
+            empresaNome, 
+            empresaEmail,
+            vantagemNome, 
+            vantagemDescricao, 
+            vantagemCusto, 
+            vantagemImagem,
+            codigoResgate,
+            saldoAtual 
+        } = data;
+
+        const dataResgate = new Date().toLocaleDateString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        try {
+            console.log('Enviando emails de resgate de vantagem...', data);
+
+            // Validar emails antes de enviar
+            if (!alunoEmail || !alunoEmail.includes('@')) {
+                throw new Error(`Email do aluno inválido: ${alunoEmail}`);
+            }
+            
+            if (!empresaEmail || !empresaEmail.includes('@')) {
+                throw new Error(`Email da empresa inválido: ${empresaEmail}`);
+            }
+
+            // Enviar email para o aluno
+            const alunoTemplateParams = {
+                to_email: alunoEmail,      // Campo principal
+                email: alunoEmail,         // Alternativa 1
+                user_email: alunoEmail,    // Alternativa 2
+                recipient_email: alunoEmail, // Alternativa 3
+                aluno_nome: alunoNome,
+                vantagem_nome: vantagemNome,
+                vantagem_descricao: vantagemDescricao,
+                vantagem_custo: vantagemCusto,
+                vantagem_imagem: vantagemImagem || '', // URL da imagem da vantagem
+                empresa_nome: empresaNome,
+                codigo_resgate: codigoResgate,
+                data_resgate: dataResgate,
+                saldo_atual: saldoAtual
+            };
+
+            console.log('Enviando email para o aluno:', alunoTemplateParams);
+            console.log('Template ID:', EMAILJS_CONFIG.TEMPLATE_ID_VANTAGEM_RESGATE);
+            console.log('Service ID:', EMAILJS_CONFIG.SERVICE_ID);
+
+            // Tentar enviar email para o aluno primeiro
+            try {
+                console.log('Tentando enviar email com emailjs.send...');
+                const alunoResponse = await emailjs.send(
+                    EMAILJS_CONFIG.SERVICE_ID,
+                    EMAILJS_CONFIG.TEMPLATE_ID_VANTAGEM_RESGATE,
+                    alunoTemplateParams
+                );
+                console.log('Email do aluno enviado com sucesso:', alunoResponse);
+            } catch (alunoError) {
+                console.error('Erro detalhado ao enviar email para o aluno:', alunoError);
+                console.error('Status:', alunoError.status);
+                console.error('Text:', alunoError.text);
+                
+                // Tentar com um template de teste mais simples
+                console.log('Tentando enviar com template simplificado...');
+                const templateSimples = {
+                    to_email: alunoEmail,
+                    email: alunoEmail,
+                    user_email: alunoEmail,
+                    recipient_email: alunoEmail,
+                    message: `Teste de email - Vantagem ${vantagemNome} resgatada por ${alunoNome}`,
+                    subject: 'Teste de Resgate de Vantagem'
+                };
+                
+                try {
+                    const testeResponse = await emailjs.send(
+                        EMAILJS_CONFIG.SERVICE_ID,
+                        EMAILJS_CONFIG.TEMPLATE_ID_VANTAGEM_RESGATE,
+                        templateSimples
+                    );
+                    console.log('Email teste enviado:', testeResponse);
+                } catch (testeError) {
+                    console.error('Erro no teste também:', testeError);
+                }
+                
+                throw new Error(`Erro no email do aluno: ${alunoError.text || alunoError.message}`);
+            }
+
+            // Enviar email para a empresa
+            const empresaTemplateParams = {
+                to_email: empresaEmail,      // Campo principal
+                email: empresaEmail,         // Alternativa 1
+                user_email: empresaEmail,    // Alternativa 2
+                recipient_email: empresaEmail, // Alternativa 3
+                aluno_nome: alunoNome,
+                vantagem_nome: vantagemNome,
+                vantagem_descricao: vantagemDescricao,
+                vantagem_custo: vantagemCusto,
+                vantagem_imagem: vantagemImagem || '', // URL da imagem da vantagem
+                empresa_nome: empresaNome,
+                codigo_resgate: codigoResgate,
+                data_resgate: dataResgate,
+                saldo_atual: saldoAtual
+            };
+
+            console.log('Enviando email para a empresa:', empresaTemplateParams);
+
+            try {
+                const empresaResponse = await emailjs.send(
+                    EMAILJS_CONFIG.SERVICE_ID,
+                    EMAILJS_CONFIG.TEMPLATE_ID_VANTAGEM_RESGATE,
+                    empresaTemplateParams
+                );
+                console.log('Email da empresa enviado com sucesso:', empresaResponse);
+            } catch (empresaError) {
+                console.error('Erro ao enviar email para a empresa:', empresaError);
+                // Não falhar se apenas o email da empresa der erro
+                console.warn('Continuando apesar do erro no email da empresa');
+            }
+
+            return { success: true };
+        } catch (error) {
+            console.error('Erro ao enviar emails de resgate de vantagem:', error);
             return { success: false, error };
         }
     }

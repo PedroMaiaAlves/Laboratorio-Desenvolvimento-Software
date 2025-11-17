@@ -23,6 +23,116 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let vantagemParaResgatarId = null;
 
+    // Função para atualizar o saldo do aluno no header
+    const updateSaldoDisplay = async () => {
+        const balanceElement = document.getElementById('user-balance-amount');
+        if (!balanceElement) return;
+
+        const role = typeof AuthService !== 'undefined' ? AuthService.getRole() : null;
+        const userInfo = typeof AuthService !== 'undefined' ? AuthService.getUserInfo() : null;
+        
+        if (role === 'ALUNO' && userInfo && userInfo.userId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/alunos/${userInfo.userId}/saldo`, {
+                    headers: typeof AuthService !== 'undefined' && AuthService.getToken() ? {
+                        'Authorization': `Bearer ${AuthService.getToken()}`
+                    } : {}
+                });
+                
+                if (response.ok) {
+                    const saldo = await response.json(); // Resposta direta do saldo como número
+                    balanceElement.textContent = (saldo || 0).toFixed(2);
+                }
+            } catch (error) {
+                console.error('Erro ao atualizar saldo:', error);
+            }
+        }
+    };
+
+    // Função para enviar emails de confirmação de resgate
+    const enviarEmailsResgate = async (vantagemId, alunoId) => {
+        try {
+            console.log('Iniciando envio de emails para resgate...', { vantagemId, alunoId });
+            
+            // Buscar dados da vantagem
+            const vantagemResponse = await fetch(`${API_BASE_URL}/vantagem/view/${vantagemId}`);
+            if (!vantagemResponse.ok) {
+                throw new Error('Erro ao buscar dados da vantagem');
+            }
+            const vantagem = await vantagemResponse.json();
+
+            // Buscar dados do aluno
+            const alunoResponse = await fetch(`${API_BASE_URL}/alunos/view/${alunoId}`);
+            if (!alunoResponse.ok) {
+                throw new Error('Erro ao buscar dados do aluno');
+            }
+            const aluno = await alunoResponse.json();
+
+            // Buscar saldo atual do aluno
+            const saldoResponse = await fetch(`${API_BASE_URL}/alunos/${alunoId}/saldo`);
+            let saldoAtual = 0;
+            if (saldoResponse.ok) {
+                saldoAtual = await saldoResponse.json();
+            }
+
+            // Gerar código de resgate único
+            const codigoResgate = `VTG-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+
+            // Validar dados obrigatórios
+            console.log('Dados brutos recebidos:');
+            console.log('Aluno:', aluno);
+            console.log('Vantagem:', vantagem);
+            
+            // Verificar se emails existem
+            if (!aluno.email) {
+                console.error('Email do aluno não encontrado:', aluno);
+                throw new Error('Email do aluno não está disponível');
+            }
+            
+            if (!vantagem.empresa.email) {
+                console.warn('Email da empresa não encontrado, usando fallback');
+            }
+
+            // Preparar dados para o email (usando email fixo para teste)
+            const emailData = {
+                alunoNome: aluno.nome || 'Aluno',
+                alunoEmail: aluno.email || 'leockombat@gmail.com', // Fallback com email válido
+                empresaNome: vantagem.empresa.razaoSocial || 'Empresa',
+                empresaEmail: vantagem.empresa.email || 'leockombat@gmail.com', // Usando email real como fallback
+                vantagemNome: vantagem.nome || 'Vantagem',
+                vantagemDescricao: vantagem.descricao || 'Descrição não disponível',
+                vantagemCusto: vantagem.custoMoedas ? vantagem.custoMoedas.toFixed(2) : '0.00',
+                vantagemImagem: vantagem.fotoUrl || '', // Adicionando a URL da imagem da vantagem
+                codigoResgate: codigoResgate,
+                saldoAtual: saldoAtual ? saldoAtual.toFixed(2) : '0.00'
+            };
+
+            console.log('Dados preparados para email:', emailData);
+            console.log('Email do aluno:', emailData.alunoEmail);
+            console.log('Email da empresa:', emailData.empresaEmail);
+
+            // Verificar se EmailService está disponível
+            if (typeof EmailService !== 'undefined') {
+                const emailResult = await EmailService.sendVantagemResgateEmail(emailData);
+                
+                if (emailResult.success) {
+                    console.log('Emails enviados com sucesso!');
+                    showToast('📧 Emails de confirmação enviados!', 'success');
+                } else {
+                    console.error('Erro ao enviar emails:', emailResult.error);
+                    showToast('⚠️ Resgate realizado, mas erro no envio dos emails', 'warning');
+                }
+            } else {
+                console.warn('EmailService não disponível');
+                showToast('⚠️ Serviço de email não disponível', 'warning');
+            }
+
+        } catch (error) {
+            console.error('Erro no processo de envio de emails:', error);
+            showToast('⚠️ Erro ao enviar emails de confirmação', 'warning');
+        }
+    };
+
     // --- FUNÇÕES DE UTILIDADE ---
     const openModal = (modal) => modal.setAttribute('aria-hidden', 'false');
     const closeModal = (modal) => modal.setAttribute('aria-hidden', 'true');
@@ -210,13 +320,45 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const url = `${API_BASE_URL}/vantagem/resgatar/${vantagemParaResgatarId}/aluno/${alunoId}`;
-        const result = await apiCall(url, 'POST');
+        
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
 
-        if (result) {
-            showToast('Vantagem resgatada com sucesso!', 'success');
-            closeModal(resgateModal);
-            carregarVantagens();
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ message: 'Erro na operação' }));
+                
+                // Verificar se é erro de moedas insuficientes
+                if (errorData.message && (
+                    errorData.message.toLowerCase().includes('moedas insuficientes') ||
+                    errorData.message.toLowerCase().includes('insufficient')
+                )) {
+                    showToast('💰 Moedas insuficientes para realizar o resgate!', 'insufficient-funds');
+                } else {
+                    showToast(errorData.message || 'Erro ao resgatar vantagem', 'error');
+                }
+                return;
+            }
+
+            const result = await response.json();
+            
+            if (result) {
+                showToast('🎉 Vantagem resgatada com sucesso!', 'success');
+                closeModal(resgateModal);
+                carregarVantagens();
+                // Atualizar saldo no header
+                updateSaldoDisplay();
+
+                // Enviar emails de confirmação
+                await enviarEmailsResgate(vantagemParaResgatarId, alunoId);
+            }
+        } catch (error) {
+            console.error('Erro no resgate:', error);
+            showToast('Erro de conexão. Tente novamente.', 'error');
         }
+        
         vantagemParaResgatarId = null;
     };
 

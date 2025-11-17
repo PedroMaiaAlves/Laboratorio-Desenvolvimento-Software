@@ -10,6 +10,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="scripts/auth.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="scripts/email-service.js"></script>
 </head>
 <body>
 
@@ -110,57 +112,104 @@
     <script src="scripts/vantagens.js"></script>
     <script>
         // Verificar autenticação ao carregar a página
-        document.addEventListener('DOMContentLoaded', () => {
-            const role = AuthService.getRole();
-            
-            // Se não estiver autenticado, redirecionar para login
-            if (!role) {
-                window.location.href = 'login.html';
-                return;
-            }
-
-            // Ajustar exibição baseada na role
+        document.addEventListener('DOMContentLoaded', async function() {
+            const userRole = AuthService.getRole();
+            const userInfo = AuthService.getUserInfo();
             const cadastroSection = document.getElementById('cadastro-vantagem-section');
             const listagemSection = document.getElementById('listagem-vantagens-section');
-            const gerenciamentoLink = document.querySelector('a[href="index.html"]');
+            const navWrapper = document.querySelector('.vantagens-nav-wrapper');
 
-            if (role === 'EMPRESA') {
-                // Empresa pode cadastrar e gerenciar vantagens
+            // Criar header personalizado baseado no tipo de usuário
+            if (navWrapper && userRole === 'ALUNO') {
+                // Para alunos, criar um header especial com saldo de moedas
+                navWrapper.innerHTML = `
+                    <div class="user-info-panel">
+                        <div class="user-avatar">👤</div>
+                        <div class="user-info-text">
+                            <div class="user-name">${userInfo?.nome || 'Aluno'}</div>
+                            <div class="user-balance">
+                                <span class="coin-icon">💰</span>
+                                <span id="user-balance-amount">0.00</span> moedas
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <nav class="vantagens-nav">
+                        <a href="vantagens.html" class="nav-link active">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="8" r="7"></circle>
+                                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                            </svg>
+                            <span>Vantagens</span>
+                        </a>
+                    </nav>
+                    
+                    <button class="logout-btn" onclick="AuthService.logout(); window.location.href='login.html';">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" x2="9" y1="12" y2="12"></line>
+                        </svg>
+                        Sair
+                    </button>
+                `;
+
+                // Buscar e exibir saldo do aluno
+                try {
+                    const response = await fetch(`http://localhost:8080/alunos/${userInfo.userId}/saldo`, {
+                        headers: AuthService.getToken() ? {
+                            'Authorization': `Bearer ${AuthService.getToken()}`
+                        } : {}
+                    });
+                    
+                    if (response.ok) {
+                        const saldo = await response.json(); // Resposta direta do saldo como número
+                        const balanceElement = document.getElementById('user-balance-amount');
+                        if (balanceElement) {
+                            balanceElement.textContent = (saldo || 0).toFixed(2);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Erro ao buscar saldo:', error);
+                }
+            }
+
+            // Configurar visibilidade das seções baseado no papel do usuário
+            if (userRole === 'EMPRESA') {
+                // Empresa pode cadastrar e visualizar vantagens
                 if (cadastroSection) cadastroSection.style.display = 'block';
                 if (listagemSection) listagemSection.style.display = 'block';
-                // Ocultar link de gerenciamento para empresa
+                // Manter navegação padrão para empresa
+                const gerenciamentoLink = document.querySelector('a[href="index.html"]');
                 if (gerenciamentoLink) gerenciamentoLink.style.display = 'none';
-            } else if (role === 'ALUNO') {
-                // Aluno só pode visualizar e resgatar vantagens
+            } else if (userRole === 'ALUNO') {
+                // Aluno só pode visualizar vantagens
                 if (cadastroSection) cadastroSection.style.display = 'none';
                 if (listagemSection) listagemSection.style.display = 'block';
-                // Ocultar link de gerenciamento para aluno
-                if (gerenciamentoLink) gerenciamentoLink.style.display = 'none';
-            } else if (role === 'PROFESSOR') {
+            } else if (userRole === 'PROFESSOR') {
                 // Professor pode visualizar vantagens e acessar gerenciamento
                 if (cadastroSection) cadastroSection.style.display = 'none';
                 if (listagemSection) listagemSection.style.display = 'block';
-                // Mostrar link de gerenciamento para professor
-                if (gerenciamentoLink) gerenciamentoLink.style.display = 'block';
+                // Manter navegação padrão para professor
             }
 
-            // Adicionar botão de logout no header
-            const header = document.querySelector('header');
-            if (header) {
-                const userInfo = AuthService.getUserInfo();
+            // Para outros tipos de usuário (não aluno), manter botão de logout simples
+            if (userRole !== 'ALUNO' && navWrapper) {
                 const logoutBtn = document.createElement('button');
-                logoutBtn.className = 'btn btn-secondary';
-                logoutBtn.style.marginLeft = 'auto';
-                logoutBtn.style.marginTop = '1rem';
-                logoutBtn.innerHTML = `<span>${userInfo?.nome || 'Usuário'} - Sair</span>`;
+                logoutBtn.className = 'logout-btn';
+                logoutBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" x2="9" y1="12" y2="12"></line>
+                    </svg>
+                    ${userInfo?.nome || 'Usuário'} - Sair
+                `;
                 logoutBtn.addEventListener('click', () => {
                     AuthService.logout();
                     window.location.href = 'login.html';
                 });
-                const navWrapper = document.querySelector('.vantagens-nav-wrapper');
-                if (navWrapper) {
-                    navWrapper.appendChild(logoutBtn);
-                }
+                navWrapper.appendChild(logoutBtn);
             }
         });
     </script>
