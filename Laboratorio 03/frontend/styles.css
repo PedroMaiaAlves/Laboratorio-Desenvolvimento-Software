@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Quantico:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
 :root {
     --primary-color: #FFB800;
     --primary-hover: #FFA600;
@@ -13,7 +15,7 @@
     --text-light: #4A5568;
     --border-color: #E2E8F0;
     --shadow-color: rgba(0, 0, 0, 0.1);
-    --font-family: 'Inter', sans-serif;
+    --font-family: 'Quantico', sans-serif;
     --border-radius: 0.75rem;
     --transition-speed: 200ms;
 }
@@ -668,6 +670,159 @@ h1 {
     }
 }
 
+/* --- Vídeo de Fundo para Login e Cadastro --- */
+.video-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    overflow: hidden;
+}
+
+.video-background video {
+    width: 100%;
+    height: 100%;
+    min-width: 100%;
+    min-height: 100%;
+    object-fit: cover;
+    object-position: center;
+    /* Garante que o vídeo seja reproduzido automaticamente em todos os navegadores */
+    pointer-events: none;
+}
+
+.video-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 184, 0, 0.1) 0%,
+        rgba(255, 215, 0, 0.15) 25%,
+        rgba(26, 32, 44, 0.4) 50%,
+        rgba(74, 85, 104, 0.6) 75%,
+        rgba(45, 55, 72, 0.8) 100%
+    );
+    z-index: -1;
+}
+
+/* Estilos específicos para páginas com vídeo de fundo */
+body.video-bg {
+    background: linear-gradient(135deg, 
+        rgba(255, 184, 0, 0.8) 0%, 
+        rgba(255, 215, 0, 0.6) 25%,
+        rgba(26, 32, 44, 0.7) 50%,
+        rgba(74, 85, 104, 0.8) 75%,
+        rgba(45, 55, 72, 0.9) 100%
+    ), 
+    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a"><stop offset="0%" stop-color="%23FFB800" stop-opacity="0.1"/><stop offset="100%" stop-color="%23FFD700" stop-opacity="0.3"/></radialGradient></defs><rect width="100%" height="100%" fill="url(%23a)"/></svg>');
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden; /* Evita scroll horizontal */
+}
+
+body.video-bg::before {
+    display: none; /* Remove o gradiente padrão */
+}
+
+/* Melhorar scrollbar para modais com muito conteúdo */
+.auth-card::-webkit-scrollbar {
+    width: 8px;
+}
+
+.auth-card::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.auth-card::-webkit-scrollbar-thumb {
+    background: rgba(255, 184, 0, 0.6);
+    border-radius: 4px;
+}
+
+.auth-card::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 184, 0, 0.8);
+}
+
+/* Container para formulários de login/cadastro */
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.auth-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--border-radius);
+    padding: 3rem;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    animation: slideUp 0.6s ease-out;
+}
+
+.auth-card h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--text-color);
+    font-weight: 700;
+    font-size: 2rem;
+}
+
+.auth-card .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.auth-card .form-group input {
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(255, 184, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.auth-card .form-group input:focus {
+    background: white;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(255, 184, 0, 0.2);
+}
+
+.auth-card .btn-primary {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary-color), var(--header-gradient));
+    border: none;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 25px rgba(255, 184, 0, 0.3);
+}
+
+.auth-card .btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-hover), var(--primary-color));
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px rgba(255, 184, 0, 0.4);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
 /* --- Responsividade --- */
 @media (max-width: 768px) {
     h1 {
@@ -699,6 +854,20 @@ h1 {
     }
 
     .profile-title {
+        font-size: 1.75rem;
+    }
+
+    /* Responsividade para auth */
+    .auth-container {
+        padding: 1rem;
+    }
+
+    .auth-card {
+        padding: 2rem;
+        max-width: 100%;
+    }
+
+    .auth-card h1 {
         font-size: 1.75rem;
     }
 }

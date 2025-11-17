@@ -7,54 +7,24 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quantico:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <script src="scripts/input-mask.js"></script>
     <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            margin: 0;
-            padding: 2rem;
-        }
-
-        .cadastro-container {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            padding: 3rem;
+        /* Estilos específicos para página de cadastro */
+        .auth-card {
             max-width: 600px;
-            width: 100%;
-            max-height: 90vh;
+            max-height: 85vh;
             overflow-y: auto;
-        }
-
-        .cadastro-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .cadastro-header img {
-            max-width: 120px;
-            margin-bottom: 1rem;
-        }
-
-        .cadastro-header h1 {
-            color: #333;
-            margin: 0;
-            font-size: 1.8rem;
         }
 
         .tipo-usuario-group {
             margin-bottom: 2rem;
         }
 
-        .tipo-usuario-group label {
+        .tipo-usuario-group > label {
             display: block;
             margin-bottom: 0.75rem;
-            color: #333;
+            color: var(--text-color);
             font-weight: 600;
         }
 
@@ -76,58 +46,26 @@
         .tipo-option label {
             display: block;
             padding: 1rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            font-weight: 500;
-            color: #666;
+            font-weight: 600;
+            color: var(--text-light);
+            background: rgba(255, 255, 255, 0.9);
         }
 
         .tipo-option input[type="radio"]:checked + label {
-            border-color: #667eea;
-            background: #667eea;
+            border-color: var(--primary-color);
+            background: var(--primary-color);
             color: white;
+            box-shadow: 0 4px 15px rgba(255, 184, 0, 0.3);
         }
 
         .tipo-option label:hover {
-            border-color: #667eea;
-        }
-
-        .form-section {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #333;
-            font-weight: 500;
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-            box-sizing: border-box;
-            font-family: inherit;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #667eea;
+            border-color: var(--primary-color);
+            background: white;
         }
 
         .form-group textarea {
@@ -135,91 +73,51 @@
             min-height: 80px;
         }
 
-        .btn-cadastrar {
-            width: 100%;
-            padding: 0.875rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin-top: 1rem;
-        }
-
-        .btn-cadastrar:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-cadastrar:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .cadastro-links {
+        .error-message, .success-message {
+            padding: 0.75rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
             text-align: center;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid #e0e0e0;
-        }
-
-        .cadastro-links p {
-            color: #666;
-            margin-bottom: 0.5rem;
-        }
-
-        .cadastro-links a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .cadastro-links a:hover {
-            text-decoration: underline;
+            display: none;
+            font-weight: 600;
         }
 
         .error-message {
-            background: #fee;
-            color: #c33;
-            padding: 0.75rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            text-align: center;
-            display: none;
-        }
-
-        .error-message.show {
-            display: block;
+            background: rgba(220, 38, 38, 0.1);
+            color: var(--danger-color);
+            border: 1px solid rgba(220, 38, 38, 0.3);
         }
 
         .success-message {
-            background: #efe;
-            color: #3c3;
-            padding: 0.75rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            text-align: center;
-            display: none;
-        }
-
-        .success-message.show {
-            display: block;
+            background: rgba(22, 163, 74, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(22, 163, 74, 0.3);
         }
     </style>
 </head>
-<body>
-    <div class="cadastro-container">
-        <div class="cadastro-header">
-            <img src="imagens/Moedalogo.png" alt="Moeda Estudantil Logo">
-            <h1>Cadastro</h1>
-        </div>
+<body class="video-bg">
+    <!-- Vídeo de Fundo -->
+    <div class="video-background">
+        <video autoplay muted loop playsinline>
+            <source src="imagens/Time Lapse - PUC Minas Coração Eucarístico.mp4" type="video/mp4">
+            <!-- Fallback para navegadores que não suportam vídeo -->
+            Seu navegador não suporta vídeos HTML5.
+        </video>
+    </div>
+    
+    <!-- Overlay para melhorar legibilidade -->
+    <div class="video-overlay"></div>
 
-        <div id="error-message" class="error-message"></div>
-        <div id="success-message" class="success-message"></div>
+    <!-- Container de Autenticação -->
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="cadastro-header" style="text-align: center; margin-bottom: 2rem;">
+                <img src="imagens/Moedalogo.png" alt="Moeda Estudantil Logo" style="max-width: 120px; margin-bottom: 1rem;">
+                <h1>Cadastro</h1>
+            </div>
+
+            <div id="error-message" class="error-message"></div>
+            <div id="success-message" class="success-message"></div>
 
         <form id="cadastro-form">
             <!-- Seleção de Tipo de Usuário -->
@@ -324,15 +222,17 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn-cadastrar" id="cadastrar-btn">Cadastrar</button>
+            <button type="submit" class="btn btn-primary" id="cadastrar-btn">Cadastrar</button>
         </form>
 
-        <div class="cadastro-links">
-            <p>Já tem uma conta?</p>
-            <a href="login.html">Faça login aqui</a>
+        <div class="cadastro-links" style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+            <p style="color: var(--text-light); margin-bottom: 0.5rem;">Já tem uma conta?</p>
+            <a href="login.html" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">Faça login aqui</a>
+        </div>
         </div>
     </div>
 
+    <script src="scripts/video-background.js"></script>
     <script src="scripts/auth.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -387,19 +287,19 @@
 
             const showError = (message) => {
                 errorMessage.textContent = message;
-                errorMessage.classList.add('show');
-                successMessage.classList.remove('show');
+                errorMessage.style.display = 'block';
+                successMessage.style.display = 'none';
                 setTimeout(() => {
-                    errorMessage.classList.remove('show');
+                    errorMessage.style.display = 'none';
                 }, 5000);
             };
 
             const showSuccess = (message) => {
                 successMessage.textContent = message;
-                successMessage.classList.add('show');
-                errorMessage.classList.remove('show');
+                successMessage.style.display = 'block';
+                errorMessage.style.display = 'none';
                 setTimeout(() => {
-                    successMessage.classList.remove('show');
+                    successMessage.style.display = 'none';
                 }, 5000);
             };
 
@@ -425,8 +325,8 @@
             cadastroForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 cadastrarBtn.disabled = true;
-                errorMessage.classList.remove('show');
-                successMessage.classList.remove('show');
+                errorMessage.style.display = 'none';
+                successMessage.style.display = 'none';
 
                 const tipoUsuario = document.querySelector('input[name="tipoUsuario"]:checked')?.value;
                 if (!tipoUsuario) {
