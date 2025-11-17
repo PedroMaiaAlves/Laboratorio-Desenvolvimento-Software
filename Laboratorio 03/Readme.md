@@ -233,10 +233,12 @@ classDiagram
 
 ## Diagrama de Sequencia do requisito Cadastro de Vantagem
 
-<img width="1007" height="355" alt="image" src="https://github.com/user-attachments/assets/810b0e1b-7c96-4275-acfa-798c49f506b0" />
+<img width="735" height="371" alt="image" src="https://github.com/user-attachments/assets/680406c7-9c02-48f2-bb47-5109f7925dfc" />
+
 
 ## Diagrama de Sequencia do requisito Lista de Vantagens do Aluno.
 
-<img width="866" height="355" alt="image" src="https://github.com/user-attachments/assets/24780767-26db-4a98-8604-32bd6b2af94e" />
+<img width="834" height="371" alt="image" src="https://github.com/user-attachments/assets/da041a51-6c13-455a-a805-77dd93bf817d" />
+
 
 ---
