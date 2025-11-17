@@ -46,6 +46,10 @@ public class VantagemService {
         return vantagem;
     }
 
+    public Vantagem getVantagem(Long id) {
+        return vantagemRepository.findById(id).orElseThrow(() -> new RuntimeException("not found"));
+    }
+
     public List<Vantagem> listarVantagensAtivas() {
         return vantagemRepository.findByAtivaTrue();
     }

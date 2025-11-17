@@ -28,6 +28,12 @@ public class VantagemController {
         }
     }
 
+    @Get("/view/{id}")
+    @Secured(SecurityRule.IS_ANONYMOUS)
+    public HttpResponse<?> getVantagem(@PathVariable Long id) {
+        return HttpResponse.ok(vantagemService.getVantagem(id));
+    }
+
     // NOVO ENDPOINT: Listar vantagens por aluno
     @Get("/aluno/{alunoId}")
     @Secured(SecurityRule.IS_ANONYMOUS)
