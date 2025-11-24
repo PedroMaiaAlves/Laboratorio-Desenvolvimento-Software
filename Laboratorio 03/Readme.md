@@ -574,12 +574,6 @@ Organização do projeto seguindo as melhores práticas de desenvolvimento:
 
 ---
 
-## 🎥 Demonstração
-
-### 🌐 Sistema Web
-
-<img src="Lab 03.gif" align="center" style="width:100%;" alt="Demonstração do Sistema de Moeda Estudantil">
-
 ### 💻 Funcionalidades Principais
 
 Para melhor visualização, as principais telas do sistema estão organizadas por perfil de usuário:
