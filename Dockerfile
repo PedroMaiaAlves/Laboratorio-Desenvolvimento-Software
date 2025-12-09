@@ -3,11 +3,11 @@ FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /home/app
 
 # Copy project files (pointing to the subfolder)
-COPY "Laboratorio 03/moedas_micronaut/pom.xml" ./pom.xml
-COPY "Laboratorio 03/moedas_micronaut/.mvn" ./.mvn
-COPY "Laboratorio 03/moedas_micronaut/mvnw" ./mvnw
-COPY "Laboratorio 03/moedas_micronaut/mvnw.bat" ./mvnw.bat
-COPY "Laboratorio 03/moedas_micronaut/src" ./src
+COPY "Laboratorio_03/moedas_micronaut/pom.xml" ./pom.xml
+COPY "Laboratorio_03/moedas_micronaut/.mvn" ./.mvn
+COPY "Laboratorio_03/moedas_micronaut/mvnw" ./mvnw
+COPY "Laboratorio_03/moedas_micronaut/mvnw.bat" ./mvnw.bat
+COPY "Laboratorio_03/moedas_micronaut/src" ./src
 
 # Build the application
 RUN ./mvnw package -DskipTests
