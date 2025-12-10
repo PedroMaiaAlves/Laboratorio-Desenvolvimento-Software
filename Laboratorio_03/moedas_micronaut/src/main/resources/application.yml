@@ -1,20 +1,16 @@
 micronaut:
   server:
     cors:
-      enabled: true
-      configurations:
-        web:
-          allowed-origins:
-            - "https://laboratoriodesenvolvimentosoftware.vercel.app"
-            - "http://localhost:5173"
-            - "http://localhost:3000"
-          allowed-methods:
-            - GET
-            - POST
-            - PUT
-            - DELETE
-            - OPTIONS
-          allowed-headers:
-            - "*"
-          allow-credentials: true
-          max-age: 3600
+      enabled: false
+  security:
+    authentication: bearer
+    intercept-url-map:
+      - pattern: /auth/**
+        http-method: POST
+        access:
+          - isAnonymous()
+      - pattern: /**
+        http-method: OPTIONS
+        access:
+          - isAnonymous()
+    enabled: true
