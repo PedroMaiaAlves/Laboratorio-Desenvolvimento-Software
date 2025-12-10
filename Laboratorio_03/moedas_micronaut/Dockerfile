@@ -18,9 +18,17 @@ RUN mvn clean package -DskipTests
 # Listar JARs gerados para debug
 RUN ls -lh /app/target/*.jar
 
-# Preparar o JAR executável (encontrar o JAR principal, não -sources ou -javadoc)
+# Preparar o JAR executável
+# O shade plugin substitui o JAR original (moedas-0.1.jar) com Main-Class
+# Pega o JAR principal (não -sources, não -javadoc)
 RUN JAR_FILE=$(find /app/target -name "moedas-*.jar" -not -name "*-sources.jar" -not -name "*-javadoc.jar" -type f | head -1) && \
+    if [ -z "$JAR_FILE" ]; then \
+      echo "ERRO: JAR não encontrado!" && \
+      ls -lh /app/target/*.jar && \
+      exit 1; \
+    fi && \
     cp "$JAR_FILE" /app/target/app.jar && \
+    echo "JAR copiado: $JAR_FILE" && \
     ls -lh /app/target/app.jar
 
 # Stage 2: Runtime
@@ -33,8 +41,6 @@ RUN addgroup -S appuser && adduser -S appuser -G appuser
 
 # Copiar o JAR da aplicação preparado no stage de build
 COPY --from=build --chown=appuser:appuser /app/target/app.jar app.jar
-
-USER appuser:appuser
 
 USER appuser:appuser
 
