@@ -9,9 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const apiUrls = {
-        alunos: 'http://localhost:8080/alunos',
-        empresas: 'http://localhost:8080/empresas',
-        professores: 'http://localhost:8080/professores', // Endpoint de exemplo
+        alunos: 'https://laboratorio-desenvolvimento-software.onrender.com/alunos',
+        empresas: 'https://laboratorio-desenvolvimento-software.onrender.com/empresas',
+        professores: 'https://laboratorio-desenvolvimento-software.onrender.com/professores', // Endpoint de exemplo
     };
 
     const state = {
