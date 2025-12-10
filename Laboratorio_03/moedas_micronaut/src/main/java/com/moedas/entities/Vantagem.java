@@ -54,7 +54,7 @@ public class Vantagem {
     private Empresa empresa;
 
     @PrePersist
-    private void ensureRandomCode() {
+    public void ensureRandomCode() {
         if (this.randomCode == null || this.randomCode.isBlank()) {
             this.randomCode = generateRandomCode();
         }
