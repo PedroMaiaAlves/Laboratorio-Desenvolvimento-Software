@@ -1,11 +1,22 @@
 package com.moedas.entities;
 
+import io.micronaut.data.annotation.MappedProperty;
 import io.micronaut.serde.annotation.Serdeable;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.UUID;
 
 @Entity(name = "vantagem")
 @Data
@@ -27,9 +38,29 @@ public class Vantagem {
 
     private double custoMoedas;
 
+    @MappedProperty
+    @Column(name = "random_code", unique = true, nullable = false, updatable = false)
+    private String randomCode;
+
+    @MappedProperty
+    @Lob
+    @Column(name = "qr_code_base64", columnDefinition = "TEXT")
+    private String qrCodeBase64;
+
     private boolean ativa;
 
     @ManyToOne
     @JoinColumn(name = "empresa_id")
     private Empresa empresa;
+
+    @PrePersist
+    private void ensureRandomCode() {
+        if (this.randomCode == null || this.randomCode.isBlank()) {
+            this.randomCode = generateRandomCode();
+        }
+    }
+
+    private String generateRandomCode() {
+        return UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase();
+    }
 }

@@ -49,9 +49,9 @@ public class VantagemController {
     // NOVO ENDPOINT: Resgatar vantagem
     @Post("/resgatar/{vantagemId}/aluno/{alunoId}")
     @Secured(SecurityRule.IS_ANONYMOUS)
-    public HttpResponse<?> resgatarVantagem(@PathVariable Long vantagemId, @PathVariable Long alunoId) {
+    public HttpResponse<?> resgatarVantagem(@PathVariable Long vantagemId, @PathVariable Long alunoId, @QueryValue String urlVantagem) {
         try {
-            return HttpResponse.ok(vantagemService.resgatarVantagem(vantagemId, alunoId));
+            return HttpResponse.ok(vantagemService.resgatarVantagem(vantagemId, alunoId, urlVantagem));
         } catch (Exception e) {
             return HttpResponse.badRequest(e.getMessage());
         }

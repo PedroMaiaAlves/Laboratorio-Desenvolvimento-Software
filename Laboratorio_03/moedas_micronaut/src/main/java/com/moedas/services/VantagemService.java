@@ -1,5 +1,8 @@
 package com.moedas.services;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.moedas.dto.request.VantagemRequest;
 import com.moedas.entities.Aluno;
 import com.moedas.entities.Empresa;
@@ -12,7 +15,9 @@ import com.moedas.repositories.VantagemRepository;
 import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import java.util.Base64;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,7 +78,7 @@ public class VantagemService {
     }
 
  //    NOVO MÉTODO: Resgatar vantagem (associar a um aluno)
-    public Vantagem resgatarVantagem(Long vantagemId, Long alunoId) {
+    public Vantagem resgatarVantagem(Long vantagemId, Long alunoId, String urlVantagem) {
         Vantagem vantagem = vantagemRepository.findById(vantagemId)
                 .orElseThrow(() -> new RuntimeException("Vantagem não encontrada"));
 
@@ -86,6 +91,9 @@ public class VantagemService {
         if(aluno.getSaldoMoedas() < vantagem.getCustoMoedas()){
             throw new RuntimeException("Moedas insuficientes");
         }
+
+        vantagem.setQrCodeBase64(this.gerarQrBase64(urlVantagem));
+        vantagemRepository.update(vantagem);
 
         UsarVantagem usarVantagem = UsarVantagem.builder()
                 .vantagem(vantagem)
@@ -111,5 +119,20 @@ public class VantagemService {
 
         vantagemRepository.delete(vantagem);
         log.info("Vantagem {} deletada pela empresa {}", vantagem.getNome(), empresaId);
+    }
+
+    public String gerarQrBase64(String texto) {
+        try {
+            var writer = new MultiFormatWriter();
+            var matrix = writer.encode(texto, BarcodeFormat.QR_CODE, 300, 300);
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            MatrixToImageWriter.writeToStream(matrix, "PNG", out);
+
+            return Base64.getEncoder().encodeToString(out.toByteArray());
+
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao gerar QR Code", e);
+        }
     }
 }
