@@ -3,11 +3,8 @@ FROM maven:3.9-eclipse-temurin-21 AS build
 
 WORKDIR /app
 
-# Copiar arquivos de configuração do Maven primeiro (para cache de dependências)
+# Copiar arquivo pom.xml primeiro (para cache de dependências)
 COPY pom.xml .
-COPY mvnw .
-COPY mvnw.cmd .
-COPY .mvn .mvn
 
 # Baixar dependências (cache layer - otimiza builds futuros)
 RUN mvn dependency:go-offline -B || true
