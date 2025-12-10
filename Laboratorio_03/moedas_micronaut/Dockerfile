@@ -15,6 +15,14 @@ COPY src ./src
 # Compilar e criar o JAR
 RUN mvn clean package -DskipTests
 
+# Listar JARs gerados para debug
+RUN ls -lh /app/target/*.jar
+
+# Preparar o JAR executável (encontrar o JAR principal, não -sources ou -javadoc)
+RUN JAR_FILE=$(find /app/target -name "moedas-*.jar" -not -name "*-sources.jar" -not -name "*-javadoc.jar" -type f | head -1) && \
+    cp "$JAR_FILE" /app/target/app.jar && \
+    ls -lh /app/target/app.jar
+
 # Stage 2: Runtime
 FROM eclipse-temurin:21-jre-alpine
 
@@ -22,10 +30,13 @@ WORKDIR /app
 
 # Criar usuário não-root para segurança
 RUN addgroup -S appuser && adduser -S appuser -G appuser
+
+# Copiar o JAR da aplicação preparado no stage de build
+COPY --from=build --chown=appuser:appuser /app/target/app.jar app.jar
+
 USER appuser:appuser
 
-# Copiar o JAR da aplicação do stage de build
-COPY --from=build /app/target/*.jar app.jar
+USER appuser:appuser
 
 # Expor a porta (Render usa a variável PORT)
 EXPOSE 8080
