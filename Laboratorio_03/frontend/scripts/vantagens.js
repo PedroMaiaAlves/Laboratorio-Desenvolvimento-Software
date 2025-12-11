@@ -319,7 +319,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const url = `${API_BASE_URL}/vantagem/resgatar/${vantagemParaResgatarId}/aluno/${alunoId}`;
+        // URL dinâmica baseada na URL atual da página
+        const urlVantagem = window.location.href;
+
+        const url = `${API_BASE_URL}/vantagem/resgatar/${vantagemParaResgatarId}/aluno/${alunoId}/${encodeURIComponent(urlVantagem)}`;
         
         try {
             const response = await fetch(url, {

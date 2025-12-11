@@ -1,16 +1,20 @@
 package com.moedas.controllers;
 
+import java.util.List;
+
 import com.moedas.dto.request.VantagemRequest;
-import com.moedas.repositories.UsarVantagemRepository;
 import com.moedas.services.VantagemService;
-import io.micronaut.http.HttpRequest;
+
 import io.micronaut.http.HttpResponse;
-import io.micronaut.http.annotation.*;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.PathVariable;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
 
 @Controller("/vantagem")
 @RequiredArgsConstructor
@@ -47,7 +51,7 @@ public class VantagemController {
     }
 
     // NOVO ENDPOINT: Resgatar vantagem
-    @Post("/resgatar/{vantagemId}/aluno/{alunoId}")
+    @Post("/resgatar/{vantagemId}/aluno/{alunoId}/{urlVantagem}")
     @Secured(SecurityRule.IS_ANONYMOUS)
     public HttpResponse<?> resgatarVantagem(@PathVariable Long vantagemId, @PathVariable Long alunoId, @QueryValue String urlVantagem) {
         try {
