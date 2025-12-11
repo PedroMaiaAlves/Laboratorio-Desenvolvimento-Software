@@ -284,11 +284,11 @@ O **Sistema de Moeda Estudantil** foi desenvolvido seguindo uma **arquitetura em
 
 
 ## 📦 Diagrama de Casos de Uso do Sistema  
-![Imagem Diagrama de Casos de Uso](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio%2003/Diagrama%20caso%20de%20uso.png)
+![Imagem Diagrama de Casos de Uso](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio_03/Diagrama%20caso%20de%20uso.png)
 
 ## Diagrama de Componentes
 
-![Imagem Diagrama de Componentes](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio%2003/Diagrama%20Componentes%20Lab%203.png)
+![Imagem Diagrama de Componentes](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio_03/Diagrama%20Componentes%20Lab%203.png)
 
 ## Diagrama de Classe
 
@@ -378,12 +378,12 @@ classDiagram
 
 ### Diagrama de Entidade-Relacionamento
 
-![Diagrama de Entidade-Relacionamento](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio%2003/Diagrama_Entidade_Relacionamento.png)
+![Diagrama de Entidade-Relacionamento](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio_03/Diagrama_Entidade_Relacionamento.png)
 ---
 
 ### Diagrama de Pacotes
 
-![Diagrama de Pacotes](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio%2003/Arquitetura.png)
+![Diagrama de Pacotes](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio_03/Arquitetura.png)
 ---
 
 ### 🧩 Explicação do modelo:
@@ -403,6 +403,9 @@ classDiagram
 <img width="834" height="371" alt="image" src="https://github.com/user-attachments/assets/da041a51-6c13-455a-a805-77dd93bf817d" />
 
 
+## Diagrama de comunicação Envio de Cupom por Email.
+
+![Diagrama de comunicação](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio_03/Diagrama%20envio%20de%20cupom.png)
 ---
 
 ## 🔧 Instalação e Execução
