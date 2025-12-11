@@ -406,7 +406,10 @@ classDiagram
 ## Diagrama de comunicação Envio de Cupom por Email.
 
 ![Diagrama de comunicação](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio_03/Diagrama%20envio%20de%20cupom.png)
----
+
+## Diagrama de Implantação
+
+![Diagrama de implantação](https://github.com/VianaLeo13/Laboratorio-Desenvolvimento-Software/blob/main/Laboratorio_03/diagrama%20de%20implanta%C3%A7%C3%A3o.png)
 
 ## 🔧 Instalação e Execução
 
