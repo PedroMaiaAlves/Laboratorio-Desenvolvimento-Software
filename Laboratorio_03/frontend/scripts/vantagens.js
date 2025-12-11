@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- CONFIGURAÇÕES ---
-    const API_BASE_URL = 'http://localhost:8080';
+    const API_BASE_URL = 'https://laboratorio-desenvolvimento-software.onrender.com';
     
     // Carregar auth.js se disponível
     if (typeof AuthService === 'undefined') {
@@ -319,7 +319,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const url = `${API_BASE_URL}/vantagem/resgatar/${vantagemParaResgatarId}/aluno/${alunoId}`;
+        // URL dinâmica baseada na URL atual da página
+        const urlVantagem = window.location.href;
+
+        const url = `${API_BASE_URL}/vantagem/resgatar/${vantagemParaResgatarId}/aluno/${alunoId}/${encodeURIComponent(urlVantagem)}`;
         
         try {
             const response = await fetch(url, {
