@@ -113,6 +113,9 @@
     <script>
         // Verificar autenticação ao carregar a página
         document.addEventListener('DOMContentLoaded', async function() {
+            const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:8080'
+    : 'https://laboratorio-desenvolvimento-software.onrender.com';
             const userRole = AuthService.getRole();
             const userInfo = AuthService.getUserInfo();
             const cadastroSection = document.getElementById('cadastro-vantagem-section');
@@ -156,7 +159,7 @@
 
                 // Buscar e exibir saldo do aluno
                 try {
-                    const response = await fetch(`https://laboratorio-desenvolvimento-software.onrender.com/alunos/${userInfo.userId}/saldo`, {
+                    const response = await fetch(`${API_BASE_URL}/alunos/${userInfo.userId}/saldo`, {
                         headers: AuthService.getToken() ? {
                             'Authorization': `Bearer ${AuthService.getToken()}`
                         } : {}

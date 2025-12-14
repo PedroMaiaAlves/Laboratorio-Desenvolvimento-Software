@@ -1,5 +1,7 @@
 // --- CONFIGURAÇÕES DE AUTENTICAÇÃO ---
-const API_BASE_URL = 'https://laboratorio-desenvolvimento-software.onrender.com';
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:8080'
+    : 'https://laboratorio-desenvolvimento-software.onrender.com';
 const AUTH_STORAGE_KEY = 'auth_data';
 
 // --- FUNÇÕES DE AUTENTICAÇÃO ---
