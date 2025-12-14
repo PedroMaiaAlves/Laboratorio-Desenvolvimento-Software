@@ -367,7 +367,8 @@
             if (headerContent) {
                 const userInfo = AuthService.getUserInfo();
                 const logoutBtn = document.createElement('button');
-                logoutBtn.className = 'btn btn-secondary';
+                // Adicionar classe especial para professor
+                logoutBtn.className = role === 'PROFESSOR' ? 'btn btn-logout-professor' : 'btn btn-secondary';
                 logoutBtn.style.marginLeft = 'auto';
                 logoutBtn.innerHTML = `<span>${userInfo?.nome || 'Usuário'} - Sair</span>`;
                 logoutBtn.addEventListener('click', () => {

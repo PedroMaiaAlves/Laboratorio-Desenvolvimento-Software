@@ -292,6 +292,21 @@ h1 {
 .btn-danger { background-color: var(--danger-color); }
 .btn-danger:hover { background-color: var(--danger-hover); }
 
+/* Botão de logout para professor */
+.btn-logout-professor {
+    background-color: var(--danger-color);
+    color: white;
+    border: 2px solid var(--danger-color);
+    font-weight: 600;
+}
+
+.btn-logout-professor:hover {
+    background-color: var(--danger-hover);
+    border-color: var(--danger-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(220, 38, 38, 0.3);
+}
+
 .btn-icon {
     background: none;
     padding: 0.5rem;
