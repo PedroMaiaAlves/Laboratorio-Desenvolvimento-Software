@@ -1,3 +1,7 @@
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:8080'
+    : 'https://laboratorio-desenvolvimento-software.onrender.com';
+
 document.addEventListener('DOMContentLoaded', () => {
     // Verificar autenticação
     if (typeof AuthService !== 'undefined') {
@@ -9,9 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const apiUrls = {
-        alunos: 'https://laboratorio-desenvolvimento-software.onrender.com/alunos',
-        empresas: 'https://laboratorio-desenvolvimento-software.onrender.com/empresas',
-        professores: 'https://laboratorio-desenvolvimento-software.onrender.com/professores', // Endpoint de exemplo
+        alunos: `${API_BASE_URL}/alunos`,
+        empresas: `${API_BASE_URL}/empresas`,
+        professores: `${API_BASE_URL}/professores`, // Endpoint de exemplo
     };
 
     const state = {
