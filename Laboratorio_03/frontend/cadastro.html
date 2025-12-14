@@ -232,6 +232,7 @@
         </div>
     </div>
 
+    <script src="scripts/config.js"></script>
     <script src="scripts/video-background.js"></script>
     <script src="scripts/auth.js"></script>
     <script>
@@ -241,10 +242,6 @@
             const errorMessage = document.getElementById('error-message');
             const successMessage = document.getElementById('success-message');
             const tipoUsuarioRadios = document.querySelectorAll('input[name="tipoUsuario"]');
-
-            const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:8080'
-    : 'https://laboratorio-desenvolvimento-software.onrender.com';
 
             // Mostrar/ocultar campos baseado no tipo selecionado
             tipoUsuarioRadios.forEach(radio => {
