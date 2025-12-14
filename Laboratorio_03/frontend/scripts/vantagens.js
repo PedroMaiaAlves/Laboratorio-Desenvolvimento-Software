@@ -47,16 +47,34 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Função para enviar emails de confirmação de resgate
-    const enviarEmailsResgate = async (vantagemId, alunoId) => {
+    const enviarEmailsResgate = async (vantagemId, alunoId, vantagemResgatada) => {
         try {
             console.log('Iniciando envio de emails para resgate...', { vantagemId, alunoId });
             
-            // Buscar dados da vantagem
+            // Buscar dados da vantagem (atualizada com QR code)
             const vantagemResponse = await fetch(`${API_BASE_URL}/vantagem/view/${vantagemId}`);
             if (!vantagemResponse.ok) {
                 throw new Error('Erro ao buscar dados da vantagem');
             }
             const vantagem = await vantagemResponse.json();
+            
+            // Usar o QR code da vantagem resgatada (retornada pelo backend) ou buscar novamente
+            let qrCodeBase64 = vantagemResgatada?.qrCodeBase64 || vantagem?.qrCodeBase64 || '';
+            
+            // Verificar se o QR Code já tem o prefixo data:image, caso contrário adicionar
+            if (qrCodeBase64 && !qrCodeBase64.startsWith('data:image')) {
+                qrCodeBase64 = `data:image/png;base64,${qrCodeBase64}`;
+                console.log('✅ Prefixo data:image adicionado ao QR Code');
+            }
+            
+            console.log('=== DEBUG QR CODE ===');
+            console.log('vantagemResgatada:', vantagemResgatada);
+            console.log('vantagemResgatada.qrCodeBase64:', vantagemResgatada?.qrCodeBase64);
+            console.log('vantagem.qrCodeBase64:', vantagem?.qrCodeBase64);
+            console.log('QR Code capturado:', qrCodeBase64 ? 'Sim (tamanho: ' + qrCodeBase64.length + ')' : 'Não disponível');
+            console.log('QR Code preview (primeiros 100 chars):', qrCodeBase64 ? qrCodeBase64.substring(0, 100) : 'N/A');
+            console.log('Tem prefixo data:image?', qrCodeBase64.startsWith('data:image'));
+            console.log('===================');
 
             // Buscar dados do aluno
             const alunoResponse = await fetch(`${API_BASE_URL}/alunos/view/${alunoId}`);
@@ -101,12 +119,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 vantagemCusto: vantagem.custoMoedas ? vantagem.custoMoedas.toFixed(2) : '0.00',
                 vantagemImagem: vantagem.fotoUrl || '', // Adicionando a URL da imagem da vantagem
                 codigoResgate: codigoResgate,
-                saldoAtual: saldoAtual ? saldoAtual.toFixed(2) : '0.00'
+                saldoAtual: saldoAtual ? saldoAtual.toFixed(2) : '0.00',
+                qrCodeBase64: qrCodeBase64 // Adicionar QR code em base64
             };
 
-            console.log('Dados preparados para email:', emailData);
-            console.log('Email do aluno:', emailData.alunoEmail);
-            console.log('Email da empresa:', emailData.empresaEmail);
+            console.log('=== DADOS PARA EMAIL ===');
+            console.log('emailData completo:', emailData);
+            console.log('emailData.qrCodeBase64 existe?', !!emailData.qrCodeBase64);
+            console.log('emailData.qrCodeBase64 tamanho:', emailData.qrCodeBase64?.length || 0);
+            console.log('emailData.qrCodeBase64 preview:', emailData.qrCodeBase64 ? emailData.qrCodeBase64.substring(0, 100) + '...' : 'VAZIO!');
+            console.log('========================');
 
             // Verificar se EmailService está disponível
             if (typeof EmailService !== 'undefined') {
@@ -318,8 +340,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // URL dinâmica baseada na URL atual da página
         const urlVantagem = window.location.href;
+        
+        console.log('=== CHAMADA API RESGATE ===');
+        console.log('URL da vantagem (window.location.href):', urlVantagem);
+        console.log('URL codificada:', encodeURIComponent(urlVantagem));
 
         const url = `${API_BASE_URL}/vantagem/resgatar/${vantagemParaResgatarId}/aluno/${alunoId}/${encodeURIComponent(urlVantagem)}`;
+        console.log('URL completa da API:', url);
+        console.log('===========================');
         
         try {
             const response = await fetch(url, {
@@ -344,6 +372,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const result = await response.json();
             
+            console.log('=== RESPOSTA DO BACKEND (RESGATE) ===');
+            console.log('Result completo:', result);
+            console.log('result.qrCodeBase64 existe?', !!result.qrCodeBase64);
+            console.log('result.qrCodeBase64 preview:', result.qrCodeBase64 ? result.qrCodeBase64.substring(0, 100) : 'N/A');
+            console.log('=====================================');
+            
             if (result) {
                 showToast('🎉 Vantagem resgatada com sucesso!', 'success');
                 closeModal(resgateModal);
@@ -351,8 +385,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Atualizar saldo no header
                 updateSaldoDisplay();
 
-                // Enviar emails de confirmação
-                await enviarEmailsResgate(vantagemParaResgatarId, alunoId);
+                // Enviar emails de confirmação passando a vantagem resgatada com QR code
+                await enviarEmailsResgate(vantagemParaResgatarId, alunoId, result);
             }
         } catch (error) {
             console.error('Erro no resgate:', error);

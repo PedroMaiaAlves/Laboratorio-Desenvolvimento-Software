@@ -109,7 +109,8 @@ class EmailService {
             vantagemCusto, 
             vantagemImagem,
             codigoResgate,
-            saldoAtual 
+            saldoAtual,
+            qrCodeBase64  // Adicionar QR code em base64
         } = data;
 
         const dataResgate = new Date().toLocaleDateString('pt-BR', {
@@ -146,7 +147,8 @@ class EmailService {
                 empresa_nome: empresaNome,
                 codigo_resgate: codigoResgate,
                 data_resgate: dataResgate,
-                saldo_atual: saldoAtual
+                saldo_atual: saldoAtual,
+                qr_code_base64: qrCodeBase64 || '' // Adicionar QR code em base64
             };
 
             console.log('Enviando email para o aluno:', alunoTemplateParams);
@@ -206,7 +208,8 @@ class EmailService {
                 empresa_nome: empresaNome,
                 codigo_resgate: codigoResgate,
                 data_resgate: dataResgate,
-                saldo_atual: saldoAtual
+                saldo_atual: saldoAtual,
+                qr_code_base64: qrCodeBase64 || '' // Adicionar QR code em base64
             };
 
             console.log('Enviando email para a empresa:', empresaTemplateParams);
