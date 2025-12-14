@@ -1,10 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- CONFIGURAÇÕES ---
-    const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:8080'
-    : 'https://laboratorio-desenvolvimento-software.onrender.com';
-    
     // Carregar auth.js se disponível
     if (typeof AuthService === 'undefined') {
         const authScript = document.createElement('script');
